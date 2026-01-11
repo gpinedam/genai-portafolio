@@ -2,15 +2,21 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-env_path = Path(__file__).resolve().parents[2] / ".env"
-load_dotenv(env_path)
+class Settings:
+    def __init__(self):
+        # Localizar y cargar el archivo .env
+        env_path = Path(__file__).resolve().parents[2] / ".env"
+        load_dotenv(env_path)
 
-# AI SERVICES
-PROJECT_NAME = os.getenv("PROJECT_NAME", "Portafolio GenAI")
-API_KEY = os.getenv("OPENAI_API_KEY", "")
-AI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-nano")
-TEMPERATURE = os.getenv("OPENAI_TEMPERATURE", 0)
-LIMIT_TOKENS = os.getenv("OPENAI_LIMIT_TOKENS", 20000)
+        # AI SERVICES
+        self.PROJECT_NAME = os.getenv("PROJECT_NAME", "Portafolio GenAI")
+        self.API_KEY = os.getenv("OPENAI_API_KEY", "")
+        self.AI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-nano")
+        self.TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0"))
+        self.LIMIT_TOKENS = int(os.getenv("LIMIT_TOKENS", "20000"))
 
-# PROJECT CONFIGURATION
-LIMIT_QUESTIONS = os.getenv("LIMIT_QUESTIONS", 10)
+        # PROJECT CONFIGURATION
+        self.LIMIT_QUESTIONS = int(os.getenv("LIMIT_QUESTIONS", "10"))
+
+# Instanciamos el objeto para que esté listo al importar
+settings = Settings()

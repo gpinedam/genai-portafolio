@@ -1,34 +1,23 @@
-from typing import Any, Dict, List
-from langchain.agents import initialize_agent, Tool, AgentExecutor, AgentType
-from langchain.memory import ConversationBufferMemory
-from langchain.chat_models import ChatOpenAI
+from typing import Any, Dict, List, Callable
 
-# define LangChain-compatible tools (handlers should be synchronous)
-tools = [
-    Tool(
-        name="generate_report",
-        func=generate_report_handler,
-        description="Genera un reporte según los parámetros suministrados."
-    ),
-    Tool(
-        name="fetch_metrics",
-        func=fetch_metrics_handler,
-        description="Recupera métricas del backend para el contexto dado."
-    ),
-]
+from langchain.agents import create_agent
+from langchain_core.tools import Tool
+from langchain_openai import ChatOpenAI
+
+ToolHandler = Callable[..., Any]
+
 
 class LangChainOrchestrator:
     def __init__(self, llm: ChatOpenAI, tools: List[Tool]):
-        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-        self.agent: AgentExecutor = initialize_agent(
-            tools,
-            llm,
-            agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-            verbose=True,
-            memory=self.memory,
+        self.agent = create_agent(
+            model=llm,
+            tools=tools,
+            system_prompt="Eres un orquestador de herramientas. Sé conciso y preciso."
         )
 
     def orchestrate(self, goal: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        prompt = f"{goal}\nContexto adicional: {context}"
-        response = self.agent.run(input=prompt)
-        return {"response": response, "history": self.memory.load_memory_variables({})}
+        user_message = f"{goal}\nContexto adicional: {context}"
+        result = self.agent.invoke(
+            {"messages": [{"role": "user", "content": user_message}]}
+        )
+        return result

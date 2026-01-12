@@ -6,46 +6,96 @@
     <title>GenAI Portafolio - AI Chat</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body data-view="chat">
     <div class="page">
       <header class="top">
         <div class="avatar-card">
           <div class="avatar-frame">
-            <div class="avatar-frame">
-              <img src="assets/avatar.png" alt="Avatar" />
-            </div>
+            <img src="assets/avatar.png" alt="Avatar" />
           </div>
         </div>
 
         <nav class="pill-nav">
-          <a href="#">Home</a>
-          <a class="active" href="#">AI Chat</a>
-          <a href="#">Projects</a>
-          <a href="#">Contact</a>
+          <a class="nav-link" href="#home" data-view="home">Home</a>
+          <a class="nav-link active" href="#chat" data-view="chat">AI Chat</a>
+          <a class="nav-link" href="#projects" data-view="projects">Projects</a>
+          <a class="nav-link" href="#contact" data-view="contact">Contact</a>
         </nav>
 
         <section class="intro-card">
-          <h2>AI Chat</h2>
-          <p>Chat con IA generativa, se pueden hacer consultas sobre el perfil.</p>
+          <h2 id="introTitle">AI Chat</h2>
+          <p id="introText">
+            Chat con IA generativa, se pueden hacer consultas sobre el perfil.
+          </p>
         </section>
       </header>
 
-      <main class="chat-shell">
-        <div class="chat-panel">
-          <div class="messages" id="messages">
-            <div class="msg bot">Hola, soy tu asistente. Pregunta lo que quieras.</div>
+      <main class="content">
+        <section class="view view-home">
+          <div class="panel-shell">
+            <div class="panel-content">
+              <div class="panel-heading">#MARKDOWN:</div>
+              <div class="panel-lines">
+                <div>DESCRIPCION - DESCRIPCION</div>
+                <div>DESCRIPCION - DESCRIPCION</div>
+                <div>DESCRIPCION - DESCRIPCION</div>
+              </div>
+            </div>
           </div>
+        </section>
 
-          <div class="composer">
-            <input
-              id="userInput"
-              type="text"
-              placeholder="Escribe tu mensaje..."
-              autocomplete="off"
-            />
-            <button id="sendBtn" type="button">Enviar</button>
+        <section class="view view-chat">
+          <div class="chat-shell">
+            <div class="chat-panel">
+              <div class="messages" id="messages">
+                <div class="msg bot">Hola, soy tu asistente. Pregunta lo que quieras.</div>
+              </div>
+
+              <div class="composer">
+                <input
+                  id="userInput"
+                  type="text"
+                  placeholder="Escribe tu mensaje..."
+                  autocomplete="off"
+                />
+                <button id="sendBtn" type="button">Enviar</button>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section class="view view-projects">
+          <div class="panel-shell">
+            <div class="panel-content">
+              <div class="project-item">
+                <span class="project-title">PROYECTO0:</span> DESCRIPCION 0
+              </div>
+              <div class="project-item">
+                <span class="project-title">PROYECTO1:</span> DESCRIPCION 1
+              </div>
+              <div class="project-item">
+                <span class="project-title">PROYECTO2:</span> DESCRIPCION 2
+              </div>
+              <div class="project-item">
+                <span class="project-title">PROYECTO3:</span> DESCRIPCION 3
+              </div>
+              <div class="project-item">
+                <span class="project-title">PROYECTO4:</span> DESCRIPCION 4
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view view-contact">
+          <div class="panel-shell">
+            <div class="contact-grid">
+              <div class="contact-main"></div>
+              <div class="contact-side"></div>
+              <div class="contact-input"></div>
+              <div class="contact-button"></div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
 

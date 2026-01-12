@@ -10,5 +10,7 @@ dependencies = [
     "langchain-openai",
     "openai",
     "jinja2",
-    "python-dotenv"
+    "python-dotenv",
+    "flask",
+    "flask-cors"
 ]

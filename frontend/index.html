@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GenAI Portafolio - AI Chat</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <div class="avatar-card">
+          <div class="avatar-frame">
+            <div class="avatar-frame">
+              <img src="assets/avatar.png" alt="Avatar" />
+            </div>
+          </div>
+        </div>
+
+        <nav class="pill-nav">
+          <a href="#">Home</a>
+          <a class="active" href="#">AI Chat</a>
+          <a href="#">Projects</a>
+          <a href="#">Contact</a>
+        </nav>
+
+        <section class="intro-card">
+          <h2>AI Chat</h2>
+          <p>Chat con IA generativa, se pueden hacer consultas sobre el perfil.</p>
+        </section>
+      </header>
+
+      <main class="chat-shell">
+        <div class="chat-panel">
+          <div class="messages" id="messages">
+            <div class="msg bot">Hola, soy tu asistente. Pregunta lo que quieras.</div>
+          </div>
+
+          <div class="composer">
+            <input
+              id="userInput"
+              type="text"
+              placeholder="Escribe tu mensaje..."
+              autocomplete="off"
+            />
+            <button id="sendBtn" type="button">Enviar</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

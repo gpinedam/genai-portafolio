@@ -9,5 +9,6 @@ dependencies = [
     "langchain-core",
     "langchain-openai",
     "openai",
+    "jinja2",
     "python-dotenv"
 ]

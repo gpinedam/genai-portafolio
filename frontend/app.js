@@ -48,7 +48,7 @@ function setView(view) {
 
 function getViewFromHash() {
   const view = window.location.hash.replace("#", "");
-  return viewCopy[view] ? view : "chat";
+  return viewCopy[view] ? view : "home";
 }
 
 navLinks.forEach((link) => {

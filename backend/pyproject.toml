@@ -15,6 +15,12 @@ dependencies = [
     "flask-cors"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov"
+]
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",

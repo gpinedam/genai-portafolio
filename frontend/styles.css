@@ -214,7 +214,7 @@ body[data-view="contact"] .view-contact {
   margin-bottom: 20px;
 }
 
-.panel-lines div {
+.panel-lines > * {
   margin-bottom: 22px;
 }
 

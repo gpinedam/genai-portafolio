@@ -34,12 +34,8 @@
         <section class="view view-home">
           <div class="panel-shell">
             <div class="panel-content">
-              <div class="panel-heading">#MARKDOWN:</div>
-              <div class="panel-lines">
-                <div>DESCRIPCION - DESCRIPCION</div>
-                <div>DESCRIPCION - DESCRIPCION</div>
-                <div>DESCRIPCION - DESCRIPCION</div>
-              </div>
+              <div class="panel-heading">HOME</div>
+              <div class="panel-lines" id="homeMarkdown"></div>
             </div>
           </div>
         </section>
@@ -67,21 +63,7 @@
         <section class="view view-projects">
           <div class="panel-shell">
             <div class="panel-content">
-              <div class="project-item">
-                <span class="project-title">PROYECTO0:</span> DESCRIPCION 0
-              </div>
-              <div class="project-item">
-                <span class="project-title">PROYECTO1:</span> DESCRIPCION 1
-              </div>
-              <div class="project-item">
-                <span class="project-title">PROYECTO2:</span> DESCRIPCION 2
-              </div>
-              <div class="project-item">
-                <span class="project-title">PROYECTO3:</span> DESCRIPCION 3
-              </div>
-              <div class="project-item">
-                <span class="project-title">PROYECTO4:</span> DESCRIPCION 4
-              </div>
+              <div class="project-list" id="projectsMarkdown"></div>
             </div>
           </div>
         </section>
@@ -99,6 +81,8 @@
       </main>
     </div>
 
-    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
+    <script src="app.js" defer></script>
   </body>
 </html>

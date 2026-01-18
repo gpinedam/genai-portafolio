@@ -26,8 +26,8 @@ jobs:
       - name: Install dependencies
         working-directory: backend
         run: |
-          uv pip install -e .
-          uv pip install pytest
+          uv venv
+          uv sync --dev
 
       - name: Run tests
         working-directory: backend

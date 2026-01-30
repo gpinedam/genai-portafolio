@@ -51,6 +51,7 @@ source "$HOME/.local/bin/env"
 | `OPENAI_TEMPERATURE` | Temperatura del modelo | `0` |
 | `LIMIT_TOKENS` | Limite de tokens (uso interno) | `20000` |
 | `LIMIT_QUESTIONS` | Limite de preguntas (uso interno) | `10` |
+| `FRONTEND_DIR` | Ruta absoluta al frontend estatico (opcional) | `/var/www/frontend` |
 
 ## Instalacion local (backend con uv)
 ```bash
@@ -65,16 +66,14 @@ uv sync
 ```bash
 cd backend
 source .venv/bin/activate
-uv run flask --app app.main:create_app run --host 0.0.0.0 --port 8000
+uv run flask --app main:create_app run --host 0.0.0.0 --port 8000
 ```
 
 Abre `http://localhost:8000` para ver el sitio.
 
-### CLI (opcional)
+### Script rapido (desde la raiz)
 ```bash
-cd backend
-source .venv/bin/activate
-uv run python main.py
+./run_local.sh
 ```
 
 ## API

@@ -1,8 +1,6 @@
 project-root/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py              # Flask app factory
-│   │   ├── wsgi.py              # Producción
 │   │   ├── __init__.py
 │   │
 │   │   ├── config/
@@ -31,6 +29,7 @@ project-root/
 │   │   ├── services/            # Logging, metrics, etc.
 │   │   └── utils/
 │   │
+│   ├── main.py                  # Flask app factory
 │   └── tests/
 │
 ├── frontend/

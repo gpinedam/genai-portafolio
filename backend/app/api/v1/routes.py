@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Dict
 from uuid import uuid4
+from pathlib import Path
+import csv
 
 from flask import Blueprint, jsonify, request
 from langchain_openai import ChatOpenAI
@@ -50,3 +52,28 @@ def chat() -> tuple:
     reply = result["messages"][-1].content
 
     return jsonify({"reply": reply, "session_id": session_id}), 200
+
+
+@api_v1.get("/contacts")
+def get_contacts() -> tuple:
+    """Devuelve los contactos guardados en el CSV."""
+    csv_path = Path("storage/info-table-genai.csv")
+    
+    if not csv_path.exists():
+        return jsonify({"contacts": []}), 200
+    
+    contacts = []
+    try:
+        with csv_path.open("r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                contacts.append({
+                    "nombres": row.get("nombres", ""),
+                    "apellidos": row.get("apellidos", ""),
+                    "correo": row.get("correo", ""),
+                    "telefono": row.get("telefono", "")
+                })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    return jsonify({"contacts": contacts}), 200

@@ -128,6 +128,12 @@ body[data-view="contact"] .view-contact {
   font-weight: 600;
 }
 
+.chat-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
 .chat-shell {
   background: var(--blue);
   padding: 26px;
@@ -153,6 +159,61 @@ body[data-view="contact"] .view-contact {
   max-height: 380px;
 }
 
+.csv-panel {
+  background: var(--blue);
+  padding: 26px;
+  border-radius: 36px;
+  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.08);
+  min-height: 420px;
+}
+
+.csv-header {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  padding: 0 4px;
+}
+
+.csv-content {
+  background: #fff;
+  border-radius: 20px;
+  padding: 18px;
+  min-height: 380px;
+  overflow-y: auto;
+}
+
+.csv-placeholder {
+  color: #999;
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.csv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.csv-table th,
+.csv-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.csv-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.csv-table tr:hover {
+  background: #fafafa;
+}
+
 .msg {
   padding: 10px 14px;
   border-radius: 14px;
@@ -162,6 +223,69 @@ body[data-view="contact"] .view-contact {
 
 .msg.bot {
   background: #f0f0f0;
+}
+
+.msg.bot h1,
+.msg.bot h2,
+.msg.bot h3,
+.msg.bot h4 {
+  margin: 8px 0 6px 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.msg.bot p {
+  margin: 6px 0;
+  line-height: 1.5;
+}
+
+.msg.bot ul,
+.msg.bot ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.msg.bot li {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.msg.bot strong {
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+.msg.bot em {
+  font-style: italic;
+}
+
+.msg.bot code {
+  background: #e8e8e8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+.msg.bot pre {
+  background: #e8e8e8;
+  padding: 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.msg.bot pre code {
+  background: none;
+  padding: 0;
+}
+
+.msg.bot blockquote {
+  border-left: 3px solid #3c6fa6;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #5a5a5a;
+  font-style: italic;
 }
 
 .msg.user {
@@ -193,6 +317,73 @@ body[data-view="contact"] .view-contact {
 
 .composer button:hover {
   filter: brightness(1.05);
+}
+
+.home-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.home-chat-shell {
+  background: var(--blue);
+  padding: 26px;
+  border-radius: 36px;
+  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.08);
+}
+
+.home-chat-panel {
+  background: var(--blue-deep);
+  border-radius: 26px;
+  padding: 18px;
+  min-height: 420px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 18px;
+}
+
+.quick-questions {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.quick-questions-label {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.quick-questions-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.question-bubble {
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+}
+
+.question-bubble:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.question-bubble:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .panel-shell {
@@ -280,6 +471,14 @@ body[data-view="contact"] .view-contact {
   }
 
   .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-container {
+    grid-template-columns: 1fr;
+  }
+
+  .home-container {
     grid-template-columns: 1fr;
   }
 }

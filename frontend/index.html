@@ -32,29 +32,65 @@
 
       <main class="content">
         <section class="view view-home">
-          <div class="panel-shell">
-            <div class="panel-content">
-              <div class="panel-heading">HOME</div>
-              <div class="panel-lines" id="homeMarkdown"></div>
+          <div class="home-container">
+            <div class="panel-shell">
+              <div class="panel-content">
+                <div class="panel-heading">HOME</div>
+                <div class="panel-lines" id="homeMarkdown"></div>
+                
+                <div class="quick-questions">
+                  <div class="quick-questions-label">Preguntas rápidas:</div>
+                  <div class="quick-questions-bubbles" id="quickQuestions">
+                    <!-- Las preguntas se cargan dinámicamente desde quick-questions.json -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="home-chat-shell">
+              <div class="home-chat-panel">
+                <div class="messages" id="homeMessages">
+                  <div class="msg bot">¡Hola! Pregúntame sobre George Pineda.</div>
+                </div>
+
+                <div class="composer">
+                  <input
+                    id="homeUserInput"
+                    type="text"
+                    placeholder="Escribe tu mensaje..."
+                    autocomplete="off"
+                  />
+                  <button id="homeSendBtn" type="button">Enviar</button>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         <section class="view view-chat">
-          <div class="chat-shell">
-            <div class="chat-panel">
-              <div class="messages" id="messages">
-                <div class="msg bot">Hola, soy tu asistente. Pregunta lo que quieras.</div>
-              </div>
+          <div class="chat-container">
+            <div class="chat-shell">
+              <div class="chat-panel">
+                <div class="messages" id="messages">
+                  <div class="msg bot">Hola, soy tu asistente. Pregunta lo que quieras.</div>
+                </div>
 
-              <div class="composer">
-                <input
-                  id="userInput"
-                  type="text"
-                  placeholder="Escribe tu mensaje..."
-                  autocomplete="off"
-                />
-                <button id="sendBtn" type="button">Enviar</button>
+                <div class="composer">
+                  <input
+                    id="userInput"
+                    type="text"
+                    placeholder="Escribe tu mensaje..."
+                    autocomplete="off"
+                  />
+                  <button id="sendBtn" type="button">Enviar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="csv-panel" id="csvPanel">
+              <div class="csv-header">Datos CSV</div>
+              <div class="csv-content" id="csvContent">
+                <p class="csv-placeholder">Los datos del CSV aparecerán aquí cuando se guarde un contacto.</p>
               </div>
             </div>
           </div>

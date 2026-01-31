@@ -5,8 +5,11 @@
       "title": "Plataforma de Reclutamiento",
       "category": "Banca",
       "tags": ["IA Generativa", "Azure", "Python"],
-      "image": "/assets/project-placeholder.jpg",
+      "image": "/assets/pj1.jpg",
       "file": "proyecto-1.md",
+      "type": "sin-demo",
+      "implementation": "enterprise",
+      "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
       "featured": true
     },
     {
@@ -14,8 +17,11 @@
       "title": "Verificación de Documentos Legales",
       "category": "Finanzas",
       "tags": ["Azure Cognitive", "OCR", "Automatización"],
-      "image": "/assets/project-placeholder.jpg",
+      "image": "/assets/pj2.jpg",
       "file": "proyecto-2.md",
+      "type": "sin-demo",
+      "implementation": "poc",
+      "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
       "featured": true
     },
     {
@@ -23,8 +29,10 @@
       "title": "Digitalización de Recetas Médicas",
       "category": "Salud",
       "tags": ["OCR", "LLM", "Azure"],
-      "image": "/assets/project-placeholder.jpg",
+      "image": "/assets/pj3.jpg",
       "file": "proyecto-3.md",
+      "type": "sin-demo",
+      "implementation": "mvp",
       "featured": false
     },
     {
@@ -32,8 +40,10 @@
       "title": "Asignación de Líneas de Crédito",
       "category": "Finanzas",
       "tags": ["Multiagente", "Predicción", "ML"],
-      "image": "/assets/project-placeholder.jpg",
+      "image": "/assets/pj4.jpg",
       "file": "proyecto-4.md",
+      "type": "sin-demo",
+      "implementation": "poc",
       "featured": false
     },
     {
@@ -41,8 +51,11 @@
       "title": "Chatbot Agrícola",
       "category": "Agricultura",
       "tags": ["GPT-4", "RAG", "Fine-tuning"],
-      "image": "/assets/project-placeholder.jpg",
+      "image": "/assets/pj5.jpg",
       "file": "proyecto-5.md",
+      "type": "con-demo",
+      "implementation": "demo",
+      "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
       "featured": false
     }
   ]

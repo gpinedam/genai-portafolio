@@ -170,23 +170,44 @@ async function loadProjects() {
     if (!response.ok) throw new Error("No se pudo cargar projects-list.json");
     
     const data = await response.json();
-    renderProjectsGrid(data.projects);
+    
+    // Separar proyectos por tipo
+    const projectsConDemo = data.projects.filter(p => p.type === "con-demo");
+    const projectsSinDemo = data.projects.filter(p => p.type === "sin-demo");
+    
+    renderProjectsGrid(projectsConDemo, "projectsGridDemo", true);
+    renderProjectsGrid(projectsSinDemo, "projectsGridNoDemo", false);
   } catch (err) {
     console.error("Error cargando proyectos:", err);
   }
 }
 
-function renderProjectsGrid(projects) {
-  const grid = document.getElementById("projectsGrid");
+function renderProjectsGrid(projects, gridId, hasDemo) {
+  const grid = document.getElementById(gridId);
   if (!grid) return;
   
   grid.innerHTML = "";
   
   projects.forEach(project => {
     const card = document.createElement("div");
-    card.className = "project-card";
+    
+    // Construir clases de forma modular
+    const classes = ['project-card'];
+    if (hasDemo) classes.push('has-demo');
+    if (project.implementation) {
+      classes.push(`impl-${project.implementation}`);
+    }
+    card.className = classes.join(' ');
+    
+    // Determinar si hay imagen personalizada
+    const hasCustomImage = project.image && !project.image.includes('placeholder');
+    const imageStyle = hasCustomImage 
+      ? `style="background-image: url('${project.image}'); background-size: cover; background-position: center;"` 
+      : '';
+    const imageClass = hasCustomImage ? 'has-custom-image' : '';
+    
     card.innerHTML = `
-      <div class="project-card-image"></div>
+      <div class="project-card-image ${imageClass}" ${imageStyle}></div>
       <div class="project-card-content">
         <div class="project-card-category">${project.category}</div>
         <h3 class="project-card-title">${project.title}</h3>
@@ -213,11 +234,26 @@ async function openProjectModal(project) {
     
     const markdown = await response.text();
     
+    let htmlContent = "";
+    
+    // Si tiene demo, agregar el video de YouTube al inicio
+    if (project.type === "con-demo" && project.demoUrl) {
+      htmlContent += `
+        <div class="project-demo-video">
+          <iframe 
+            src="${project.demoUrl}" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+        </div>
+      `;
+    }
+    
     if (window.marked && window.DOMPurify) {
-      const htmlContent = marked.parse(markdown);
-      modalBody.innerHTML = DOMPurify.sanitize(htmlContent);
+      htmlContent += DOMPurify.sanitize(marked.parse(markdown));
+      modalBody.innerHTML = htmlContent;
     } else {
-      modalBody.textContent = markdown;
+      modalBody.innerHTML = htmlContent + markdown;
     }
     
     modal.classList.add("active");

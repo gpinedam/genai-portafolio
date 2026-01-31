@@ -1,8 +1,3 @@
-const messagesEl = document.getElementById("messages");
-const inputEl = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
-const csvContentEl = document.getElementById("csvContent");
-
 const homeMessagesEl = document.getElementById("homeMessages");
 const homeInputEl = document.getElementById("homeUserInput");
 const homeSendBtn = document.getElementById("homeSendBtn");
@@ -14,7 +9,6 @@ const homeMarkdownEl = document.getElementById("homeMarkdown");
 const projectsMarkdownEl = document.getElementById("projectsMarkdown");
 
 const API_URL = "/api/v1/chat";
-const CSV_API_URL = "/api/v1/contacts";
 let sessionId = localStorage.getItem("session_id") || "";
 
 const viewCopy = {
@@ -22,10 +16,6 @@ const viewCopy = {
     title: "GEORGE PINEDA:",
     text:
       "AI Engineer con mas de 1.5 anos de experiencia en desarrollo de soluciones de IA Generativa de alto impacto en sectores como banca, salud, tecnologia, etc."
-  },
-  chat: {
-    title: "AI Chat:",
-    text: "Chat con IA generativa, se pueden hacer consultas sobre el perfil."
   },
   projects: {
     title: "Proyectos realizados",
@@ -42,10 +32,6 @@ const viewMarkdownSources = {
   home: {
     title: "/content/home-page/home-page-title.md",
     text: "/content/home-page/home-page-home.md"
-  },
-  chat: {
-    title: "/content/chat-page/chat-page-title.md",
-    text: "/content/chat-page/chat-page-text.md"
   },
   projects: {
     title: "/content/projects-page/projects-page-title.md",
@@ -188,99 +174,6 @@ async function loadProjectsMarkdown() {
 }
 
 loadProjectsMarkdown();
-
-function appendMessage(text, role) {
-  const div = document.createElement("div");
-  div.className = `msg ${role}`;
-  
-  // Si es un mensaje del bot y tenemos marked disponible, renderizar como markdown
-  if (role === "bot" && window.marked && window.DOMPurify) {
-    const htmlContent = marked.parse(text);
-    div.innerHTML = DOMPurify.sanitize(htmlContent);
-  } else {
-    div.textContent = text;
-  }
-  
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-async function sendMessage() {
-  const text = inputEl.value.trim();
-  if (!text) return;
-
-  appendMessage(text, "user");
-  inputEl.value = "";
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text, session_id: sessionId })
-    });
-
-    if (!res.ok) throw new Error("API error");
-
-    const data = await res.json();
-    if (data.session_id) {
-      sessionId = data.session_id;
-      localStorage.setItem("session_id", sessionId);
-    }
-    appendMessage(data.reply || "Sin respuesta", "bot");
-  } catch (err) {
-    appendMessage("No pude conectar con el backend.", "bot");
-  }
-}
-
-sendBtn.addEventListener("click", sendMessage);
-inputEl.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMessage();
-});
-
-async function loadCSVData() {
-  try {
-    const res = await fetch(CSV_API_URL);
-    if (!res.ok) throw new Error("CSV API error");
-    
-    const data = await res.json();
-    renderCSVTable(data.contacts || []);
-  } catch (err) {
-    console.error("Error cargando CSV:", err);
-  }
-}
-
-function renderCSVTable(contacts) {
-  if (!csvContentEl) return;
-  
-  if (!contacts || contacts.length === 0) {
-    csvContentEl.innerHTML = '<p class="csv-placeholder">Los datos del CSV aparecerán aquí cuando se guarde un contacto.</p>';
-    return;
-  }
-  
-  const headers = ["Nombres", "Apellidos", "Correo", "Teléfono"];
-  
-  let html = '<table class="csv-table"><thead><tr>';
-  headers.forEach(h => {
-    html += `<th>${h}</th>`;
-  });
-  html += '</tr></thead><tbody>';
-  
-  contacts.forEach(contact => {
-    html += '<tr>';
-    html += `<td>${contact.nombres || ''}</td>`;
-    html += `<td>${contact.apellidos || ''}</td>`;
-    html += `<td>${contact.correo || ''}</td>`;
-    html += `<td>${contact.telefono || ''}</td>`;
-    html += '</tr>';
-  });
-  
-  html += '</tbody></table>';
-  csvContentEl.innerHTML = html;
-}
-
-// Cargar datos CSV al inicio y después de cada mensaje
-loadCSVData();
-setInterval(loadCSVData, 5000); // Recargar cada 5 segundos
 
 // Funciones para el chatbot en Home
 function appendHomeMessage(text, role) {

@@ -90,7 +90,7 @@ body[data-view="contact"] .view-contact {
 
 .pill-nav {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   background: var(--yellow);
   padding: 10px;
@@ -126,92 +126,6 @@ body[data-view="contact"] .view-contact {
 .intro-card h2 {
   margin: 0 0 6px 0;
   font-weight: 600;
-}
-
-.chat-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.chat-shell {
-  background: var(--blue);
-  padding: 26px;
-  border-radius: 36px;
-  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.08);
-}
-
-.chat-panel {
-  background: var(--blue-deep);
-  border-radius: 26px;
-  padding: 18px;
-  min-height: 420px;
-  display: grid;
-  grid-template-rows: 1fr auto;
-  gap: 18px;
-}
-
-.messages {
-  background: #fff;
-  border-radius: 20px;
-  padding: 18px;
-  overflow-y: auto;
-  max-height: 380px;
-}
-
-.csv-panel {
-  background: var(--blue);
-  padding: 26px;
-  border-radius: 36px;
-  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.08);
-  min-height: 420px;
-}
-
-.csv-header {
-  color: #fff;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 18px;
-  padding: 0 4px;
-}
-
-.csv-content {
-  background: #fff;
-  border-radius: 20px;
-  padding: 18px;
-  min-height: 380px;
-  overflow-y: auto;
-}
-
-.csv-placeholder {
-  color: #999;
-  text-align: center;
-  padding: 40px 20px;
-  font-size: 15px;
-  line-height: 1.6;
-}
-
-.csv-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.csv-table th,
-.csv-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.csv-table th {
-  background: #f5f5f5;
-  font-weight: 600;
-  color: #333;
-}
-
-.csv-table tr:hover {
-  background: #fafafa;
 }
 
 .msg {
@@ -463,22 +377,6 @@ body[data-view="contact"] .view-contact {
   }
 
   .composer {
-    grid-template-columns: 1fr;
-  }
-
-  .panel-content {
-    font-size: 18px;
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .chat-container {
-    grid-template-columns: 1fr;
-  }
-
-  .home-container {
     grid-template-columns: 1fr;
   }
 }

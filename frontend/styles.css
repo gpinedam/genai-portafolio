@@ -207,6 +207,15 @@ body[data-view="contact"] .view-contact {
   margin-left: auto;
 }
 
+.messages {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .composer {
   display: grid;
   grid-template-columns: 1fr 120px;
@@ -250,9 +259,9 @@ body[data-view="contact"] .view-contact {
   background: var(--blue-deep);
   border-radius: 26px;
   padding: 18px;
-  min-height: 420px;
-  display: grid;
-  grid-template-rows: 1fr auto;
+  height: 364px;
+  display: flex;
+  flex-direction: column;
   gap: 18px;
 }
 
@@ -305,12 +314,12 @@ body[data-view="contact"] .view-contact {
   padding: 26px;
   border-radius: 36px;
   box-shadow: 0 14px 0 rgba(0, 0, 0, 0.08);
-  min-height: 420px;
+  min-height: 294px;
 }
 
 .panel-content {
   color: #f2f2f2;
-  font-size: 22px;
+  font-size: 16px;
   line-height: 1.6;
 }
 
@@ -799,14 +808,16 @@ body[data-view="contact"] .view-contact {
 
   .home-chat-panel {
     padding: 14px;
-    min-height: 400px;
+    height: 315px;
     border-radius: 20px;
   }
 
   .messages {
     padding: 14px;
-    max-height: 350px;
+    flex: 1;
+    min-height: 0;
     border-radius: 16px;
+    overflow-y: auto;
   }
 
   .msg {
@@ -953,15 +964,17 @@ body[data-view="contact"] .view-contact {
 
   .home-chat-panel {
     padding: 12px;
-    min-height: 450px;
+    height: 336px;
     border-radius: 16px;
     gap: 10px;
   }
 
   .messages {
     padding: 12px;
-    max-height: 380px;
+    flex: 1;
+    min-height: 0;
     border-radius: 14px;
+    overflow-y: auto;
   }
 
   .msg {

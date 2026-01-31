@@ -163,6 +163,105 @@ function renderQuickQuestions(questions) {
 
 loadQuickQuestions();
 
+// Cargar y mostrar proyectos dinámicamente
+async function loadProjects() {
+  try {
+    const response = await fetch("/content/projects/projects-list.json");
+    if (!response.ok) throw new Error("No se pudo cargar projects-list.json");
+    
+    const data = await response.json();
+    renderProjectsGrid(data.projects);
+  } catch (err) {
+    console.error("Error cargando proyectos:", err);
+  }
+}
+
+function renderProjectsGrid(projects) {
+  const grid = document.getElementById("projectsGrid");
+  if (!grid) return;
+  
+  grid.innerHTML = "";
+  
+  projects.forEach(project => {
+    const card = document.createElement("div");
+    card.className = "project-card";
+    card.innerHTML = `
+      <div class="project-card-image"></div>
+      <div class="project-card-content">
+        <div class="project-card-category">${project.category}</div>
+        <h3 class="project-card-title">${project.title}</h3>
+        <div class="project-card-tags">
+          ${project.tags.map(tag => `<span class="project-tag">${tag}</span>`).join('')}
+        </div>
+      </div>
+    `;
+    
+    card.addEventListener("click", () => openProjectModal(project));
+    grid.appendChild(card);
+  });
+}
+
+async function openProjectModal(project) {
+  const modal = document.getElementById("projectModal");
+  const modalBody = document.getElementById("modalBody");
+  
+  if (!modal || !modalBody) return;
+  
+  try {
+    const response = await fetch(`/content/projects/${project.file}`);
+    if (!response.ok) throw new Error("No se pudo cargar el proyecto");
+    
+    const markdown = await response.text();
+    
+    if (window.marked && window.DOMPurify) {
+      const htmlContent = marked.parse(markdown);
+      modalBody.innerHTML = DOMPurify.sanitize(htmlContent);
+    } else {
+      modalBody.textContent = markdown;
+    }
+    
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  } catch (err) {
+    console.error("Error cargando detalles del proyecto:", err);
+    modalBody.innerHTML = "<p>Error cargando el proyecto.</p>";
+    modal.classList.add("active");
+  }
+}
+
+function closeProjectModal() {
+  const modal = document.getElementById("projectModal");
+  if (modal) {
+    modal.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+}
+
+// Event listeners para el modal
+const modalClose = document.getElementById("modalClose");
+const projectModal = document.getElementById("projectModal");
+
+if (modalClose) {
+  modalClose.addEventListener("click", closeProjectModal);
+}
+
+if (projectModal) {
+  projectModal.addEventListener("click", (e) => {
+    if (e.target === projectModal) {
+      closeProjectModal();
+    }
+  });
+}
+
+// Cerrar modal con tecla ESC
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeProjectModal();
+  }
+});
+
+loadProjects();
+
 async function loadProjectsMarkdown() {
   if (!projectsMarkdownEl || !window.marked || !window.DOMPurify) return;
   try {

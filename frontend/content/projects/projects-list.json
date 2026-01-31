@@ -1,0 +1,49 @@
+{
+  "projects": [
+    {
+      "id": "proyecto-1",
+      "title": "Plataforma de Reclutamiento",
+      "category": "Banca",
+      "tags": ["IA Generativa", "Azure", "Python"],
+      "image": "/assets/project-placeholder.jpg",
+      "file": "proyecto-1.md",
+      "featured": true
+    },
+    {
+      "id": "proyecto-2",
+      "title": "Verificación de Documentos Legales",
+      "category": "Finanzas",
+      "tags": ["Azure Cognitive", "OCR", "Automatización"],
+      "image": "/assets/project-placeholder.jpg",
+      "file": "proyecto-2.md",
+      "featured": true
+    },
+    {
+      "id": "proyecto-3",
+      "title": "Digitalización de Recetas Médicas",
+      "category": "Salud",
+      "tags": ["OCR", "LLM", "Azure"],
+      "image": "/assets/project-placeholder.jpg",
+      "file": "proyecto-3.md",
+      "featured": false
+    },
+    {
+      "id": "proyecto-4",
+      "title": "Asignación de Líneas de Crédito",
+      "category": "Finanzas",
+      "tags": ["Multiagente", "Predicción", "ML"],
+      "image": "/assets/project-placeholder.jpg",
+      "file": "proyecto-4.md",
+      "featured": false
+    },
+    {
+      "id": "proyecto-5",
+      "title": "Chatbot Agrícola",
+      "category": "Agricultura",
+      "tags": ["GPT-4", "RAG", "Fine-tuning"],
+      "image": "/assets/project-placeholder.jpg",
+      "file": "proyecto-5.md",
+      "featured": false
+    }
+  ]
+}

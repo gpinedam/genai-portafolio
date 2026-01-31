@@ -67,9 +67,19 @@
         </section>
 
         <section class="view view-projects">
-          <div class="panel-shell">
-            <div class="panel-content">
-              <div class="project-list" id="projectsMarkdown"></div>
+          <div class="projects-container">
+            <div class="projects-grid" id="projectsGrid">
+              <!-- Los proyectos se cargan dinámicamente -->
+            </div>
+          </div>
+          
+          <!-- Modal para ver detalles del proyecto -->
+          <div class="project-modal" id="projectModal">
+            <div class="project-modal-content">
+              <button class="project-modal-close" id="modalClose">×</button>
+              <div class="project-modal-body" id="modalBody">
+                <!-- Contenido del proyecto se carga aquí -->
+              </div>
             </div>
           </div>
         </section>

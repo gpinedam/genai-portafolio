@@ -63,7 +63,7 @@ body[data-view="contact"] .view-contact {
   grid-template-columns: 200px 1fr auto;
   grid-template-rows: auto auto;
   gap: 22px 16px;
-  align-items: center;
+  align-items: start;
 }
 
 .avatar-card {
@@ -96,6 +96,7 @@ body[data-view="contact"] .view-contact {
   padding: 10px;
   border-radius: 999px;
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.08);
+  align-self: center;
 }
 
 .contact-buttons-wrapper {
@@ -128,11 +129,13 @@ body[data-view="contact"] .view-contact {
   color: #eaeaea;
   padding: 20px 24px;
   border-radius: var(--card-radius);
-  min-height: 110px;
+  min-height: 120px;
+  height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   grid-column: 2 / 4;
+  overflow: hidden;
 }
 
 .intro-card h2 {

@@ -15,7 +15,8 @@ const viewCopy = {
   home: {
     title: "GEORGE PINEDA:",
     text:
-      "AI Engineer con mas de 1.5 anos de experiencia en desarrollo de soluciones de IA Generativa de alto impacto en sectores como banca, salud, tecnologia, etc."
+      "AI Engineer con mas de 1.5 anos de experiencia en desarrollo de soluciones de IA Generativa de alto impacto en sectores como banca, salud, tecnologia, etc.",
+    homePanel: "Ingeniero Mecatrónico especializado en IA Generativa"
   },
   projects: {
     title: "Proyectos realizados",
@@ -31,7 +32,8 @@ const viewCopy = {
 const viewMarkdownSources = {
   home: {
     title: "/content/home-page/home-page-title.md",
-    text: "/content/home-page/home-page-home.md"
+    text: "/content/home-page/home-page-home.md",
+    homePanel: "/content/home-page/home-page-panel.md"
   },
   projects: {
     title: "/content/projects-page/projects-page-title.md",
@@ -103,16 +105,27 @@ async function loadViewCopyFromMarkdown() {
       const copy = viewCopy[view];
       if (!copy) return;
 
-      const [titleText, bodyText] = await Promise.all([
+      const promises = [
         fetchText(sources.title).catch(() => null),
         fetchText(sources.text).catch(() => null)
-      ]);
+      ];
+      
+      // Si existe homePanel, agregarlo a las promesas
+      if (sources.homePanel) {
+        promises.push(fetchText(sources.homePanel).catch(() => null));
+      }
+
+      const results = await Promise.all(promises);
+      const [titleText, bodyText, homePanelText] = results;
 
       if (titleText) {
         copy.titleHtml = DOMPurify.sanitize(marked.parseInline(titleText.trim()));
       }
       if (bodyText) {
         copy.textHtml = DOMPurify.sanitize(marked.parse(bodyText));
+      }
+      if (homePanelText) {
+        copy.homePanelHtml = DOMPurify.sanitize(marked.parse(homePanelText));
       }
     })
   );
@@ -121,7 +134,25 @@ async function loadViewCopyFromMarkdown() {
 }
 
 async function loadHomeMarkdown() {
-  if (!homeMarkdownEl || !window.marked || !window.DOMPurify) return;
+  if (!homeMarkdownEl) return;
+  
+  // Esperar a que se carguen los markdowns primero
+  await loadViewCopyFromMarkdown();
+  
+  // Usar el contenido cargado desde markdown si existe
+  if (viewCopy.home.homePanelHtml) {
+    homeMarkdownEl.innerHTML = viewCopy.home.homePanelHtml;
+    return;
+  }
+  
+  // Si no, usar el contenido hardcoded
+  if (viewCopy.home.homePanel) {
+    homeMarkdownEl.textContent = viewCopy.home.homePanel;
+    return;
+  }
+  
+  // Fallback: intentar cargar directamente
+  if (!window.marked || !window.DOMPurify) return;
   try {
     const text = await fetchText("/content/home-page/home-page-home.md");
     homeMarkdownEl.innerHTML = DOMPurify.sanitize(marked.parse(text));

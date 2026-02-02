@@ -822,6 +822,59 @@ body[data-view="contact"] .view-contact {
   min-height: 90px;
 }
 
+/* Breakpoint para tablets y pantallas medianas */
+@media (max-width: 1100px) {
+  .top {
+    grid-template-columns: 180px 1fr auto auto;
+    gap: 18px 14px;
+  }
+
+  .avatar-card {
+    padding: 10px;
+  }
+
+  .avatar-frame {
+    height: 200px;
+  }
+
+  .pill-nav {
+    padding: 9px;
+    gap: 9px;
+  }
+
+  .pill-nav a {
+    padding: 10px 10px;
+    font-size: 15px;
+  }
+
+  .cv-download-btn {
+    padding: 16px 18px;
+    font-size: 13px;
+  }
+
+  .contact-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .contact-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .intro-card {
+    padding: 18px 22px;
+  }
+
+  .intro-card h2 {
+    font-size: 20px;
+  }
+
+  .intro-card p {
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 880px) {
   .page {
     margin: 16px auto 32px;
@@ -829,95 +882,102 @@ body[data-view="contact"] .view-contact {
   }
 
   .top {
-    grid-template-columns: 140px 1fr;
-    grid-template-rows: auto auto auto;
-    gap: 16px 20px;
-    align-items: center;
+    grid-template-columns: 140px 1fr auto;
+    grid-template-rows: auto auto auto auto;
+    gap: 12px;
+    align-items: start;
   }
 
   .avatar-card {
-    grid-row: 1;
+    grid-column: 1;
+    grid-row: 1 / span 3;
     max-width: 140px;
     padding: 8px;
     border-radius: 20px;
     box-shadow: 0 6px 0 rgba(0, 0, 0, 0.08);
+    align-self: stretch;
   }
 
   .avatar-frame {
-    height: 140px;
+    height: 100%;
     border-radius: 16px;
   }
 
   .pill-nav {
-    grid-row: 1;
     grid-column: 2;
+    grid-row: 1 / span 2;
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 8px;
     border-radius: 20px;
     box-shadow: 0 6px 0 rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
   }
 
   .pill-nav a {
     padding: 10px 12px;
     font-size: 15px;
     border-radius: 16px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cv-download-btn {
+    grid-column: 2;
+    grid-row: 3;
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: 18px;
+  }
+
+  .cv-download-btn svg {
+    width: 18px;
+    height: 18px;
   }
 
   .contact-buttons-wrapper {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: start;
-    padding: 8px 12px;
-  }
-
-  .intro-card {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    padding: 14px 18px;
-    min-height: auto;
-    border-radius: 20px;
-  }
-
-  .intro-card h2 {
-    font-size: 18px;
-    margin-bottom: 4px;
-  }
-
-  .intro-card p {
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .intro-card {
-    grid-column: 2 / -1;
-    padding: 14px 18px;
-    min-height: auto;
-    border-radius: 20px;
-  }
-
-  .intro-card h2 {
-    font-size: 18px;
-    margin-bottom: 4px;
-  }
-
-  .intro-card p {
-    font-size: 13px;
-    line-height: 1.4;
+    grid-column: 3;
+    grid-row: 1 / span 3;
+    flex-direction: column;
+    padding: 8px;
+    align-self: stretch;
   }
 
   .contact-buttons {
-    gap: 5px;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .contact-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
   }
 
   .contact-btn svg {
     width: 17px;
     height: 17px;
+  }
+
+  .intro-card {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    padding: 14px 18px;
+    min-height: auto;
+    height: auto;
+    border-radius: 20px;
+  }
+
+  .intro-card h2 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .intro-card p {
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   .home-container {

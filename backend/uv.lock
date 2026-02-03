@@ -39,6 +39,12 @@ dependencies = [
     { name = "python-dotenv" },
 ]
 
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
@@ -54,8 +60,11 @@ requires-dist = [
     { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "openai" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "python-dotenv" },
 ]
+provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [

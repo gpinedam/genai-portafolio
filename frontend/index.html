@@ -17,70 +17,106 @@
 
         <nav class="pill-nav">
           <a class="nav-link active" href="#home" data-view="home">Home</a>
-          <a class="nav-link" href="#chat" data-view="chat">AI Chat</a>
           <a class="nav-link" href="#projects" data-view="projects">Projects</a>
-          <a class="nav-link" href="#contact" data-view="contact">Contact</a>
         </nav>
 
+        <a href="assets/download/CV-PINEDA-GEORGE.pdf" class="cv-download-btn" download="CV-PINEDA-GEORGE.pdf">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+          </svg>
+          DESCARGAR CV
+        </a>
+
+        <div class="contact-buttons-wrapper">
+          <div class="contact-buttons">
+            <a href="mailto:gpineda@pucp.edu.pe" class="contact-btn btn-gmail" target="_blank" title="Email">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+            </a>
+            <a href="http://www.linkedin.com/in/gwpinedam" class="contact-btn btn-linkedin" target="_blank" title="LinkedIn">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+              </svg>
+            </a>
+            <a href="tel:+51922556245" class="contact-btn btn-phone" target="_blank" title="Teléfono">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
         <section class="intro-card">
-          <h2 id="introTitle">AI Chat</h2>
+          <h2 id="introTitle">GEORGE PINEDA:</h2>
           <p id="introText">
-            Chat con IA generativa, se pueden hacer consultas sobre el perfil.
+            Ingeniero Mecatronico especializado en IA Generativa y automatizacion inteligente.
+Experiencia en agentes conversacionales, sistemas multiagente y aplicaciones end-to-end.
           </p>
         </section>
       </header>
 
       <main class="content">
         <section class="view view-home">
-          <div class="panel-shell">
-            <div class="panel-content">
-              <div class="panel-heading">#MARKDOWN:</div>
-              <div class="panel-lines">
-                <div>DESCRIPCION - DESCRIPCION</div>
-                <div>DESCRIPCION - DESCRIPCION</div>
-                <div>DESCRIPCION - DESCRIPCION</div>
+          <div class="home-container">
+            <div class="panel-shell">
+              <div class="panel-content">
+                <div class="panel-lines" id="homeMarkdown"></div>
+                
+                <div class="quick-questions">
+                  <div class="quick-questions-label">Preguntas rápidas:</div>
+                  <div class="quick-questions-bubbles" id="quickQuestions">
+                    <!-- Las preguntas se cargan dinámicamente desde quick-questions.json -->
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
 
-        <section class="view view-chat">
-          <div class="chat-shell">
-            <div class="chat-panel">
-              <div class="messages" id="messages">
-                <div class="msg bot">Hola, soy tu asistente. Pregunta lo que quieras.</div>
-              </div>
+            <div class="home-chat-shell">
+              <div class="home-chat-panel">
+                <div class="messages" id="homeMessages">
+                  <div class="msg bot">¡Hola! Pregúntame sobre George Pineda.</div>
+                </div>
+                
+                <div class="question-counter" id="questionCounter"></div>
 
-              <div class="composer">
-                <input
-                  id="userInput"
-                  type="text"
-                  placeholder="Escribe tu mensaje..."
-                  autocomplete="off"
-                />
-                <button id="sendBtn" type="button">Enviar</button>
+                <div class="composer">
+                  <input
+                    id="homeUserInput"
+                    type="text"
+                    placeholder="Escribe tu mensaje..."
+                    autocomplete="off"
+                  />
+                  <button id="homeSendBtn" type="button">Enviar</button>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         <section class="view view-projects">
-          <div class="panel-shell">
-            <div class="panel-content">
-              <div class="project-item">
-                <span class="project-title">PROYECTO0:</span> DESCRIPCION 0
+          <div class="projects-container">
+            <div class="projects-section">
+              <h2 class="projects-section-title">Proyectos con Demo</h2>
+              <div class="projects-grid" id="projectsGridDemo">
+                <!-- Proyectos con demo -->
               </div>
-              <div class="project-item">
-                <span class="project-title">PROYECTO1:</span> DESCRIPCION 1
+            </div>
+            
+            <div class="projects-section">
+              <h2 class="projects-section-title">Proyectos participados</h2>
+              <div class="projects-grid" id="projectsGridNoDemo">
+                <!-- Proyectos sin demo -->
               </div>
-              <div class="project-item">
-                <span class="project-title">PROYECTO2:</span> DESCRIPCION 2
-              </div>
-              <div class="project-item">
-                <span class="project-title">PROYECTO3:</span> DESCRIPCION 3
-              </div>
-              <div class="project-item">
-                <span class="project-title">PROYECTO4:</span> DESCRIPCION 4
+            </div>
+          </div>
+          
+          <!-- Modal para ver detalles del proyecto -->
+          <div class="project-modal" id="projectModal">
+            <div class="project-modal-content">
+              <button class="project-modal-close" id="modalClose">×</button>
+              <div class="project-modal-body" id="modalBody">
+                <!-- Contenido del proyecto se carga aquí -->
               </div>
             </div>
           </div>
@@ -99,6 +135,8 @@
       </main>
     </div>
 
-    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
+    <script src="app.js" defer></script>
   </body>
 </html>

@@ -1,0 +1,34 @@
+{
+  "questions": [
+    {
+      "id": "experiencia-ia",
+      "emoji": "🤖",
+      "label": "Experiencia en IA",
+      "question": "Dime la experiencia en IA de George"
+    },
+    {
+      "id": "proyecto-destacable",
+      "emoji": "⭐",
+      "label": "Proyecto destacable",
+      "question": "¿Cuál es su proyecto más destacable?"
+    },
+    {
+      "id": "estudios",
+      "emoji": "🎓",
+      "label": "Estudios y carrera",
+      "question": "¿Dónde estudió y qué carrera?"
+    },
+    {
+      "id": "habilidades",
+      "emoji": "💻",
+      "label": "Habilidades técnicas",
+      "question": "¿Qué habilidades técnicas tiene?"
+    },
+    {
+      "id": "certificaciones",
+      "emoji": "🏆",
+      "label": "Certificaciones",
+      "question": "¿Qué certificaciones tiene?"
+    }
+  ]
+}

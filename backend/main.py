@@ -1,29 +1,40 @@
-# backend/main.py
 from __future__ import annotations
 
-from app.config.base import settings
-from app.orchestration.orchestrator import LangChainOrchestrator
-from langchain_openai import ChatOpenAI
-from langchain.tools import tool
+import os
+from pathlib import Path
 
-def main():
-    llm = ChatOpenAI(
-        api_key=settings.API_KEY,
-        model=settings.AI_MODEL,
-        temperature=float(settings.TEMPERATURE)
-    )
+from flask import Flask, abort, send_from_directory
+from flask_cors import CORS
 
-    orchestrator = LangChainOrchestrator(llm)
+from app.api.v1.routes import api_v1
 
-    print("Chat iniciado. Escribe 'exit' para salir.")
-    while True:
-        user_input = input("Tú: ").strip()
-        if user_input.lower() in ("exit", "salir"):
-            break
+ROOT_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = Path(os.getenv("FRONTEND_DIR", str(ROOT_DIR / "frontend")))
 
-        result = orchestrator.chat(user_input)
-        final = result["messages"][-1].content
-        print(f"Agente: {final}")
+
+def create_app() -> Flask:
+    app = Flask(__name__)
+    CORS(app, resources={r"/*": {"origins": "*"}})
+    app.register_blueprint(api_v1)
+
+    @app.get("/")
+    def index() -> object:
+        return send_from_directory(str(FRONTEND_DIR), "index.html")
+
+    @app.get("/<path:filename>")
+    def frontend_assets(filename: str) -> object:
+        file_path = FRONTEND_DIR / filename
+        if file_path.is_file():
+            return send_from_directory(str(FRONTEND_DIR), filename)
+        abort(404)
+
+    return app
+
+
+def main() -> None:
+    host = os.getenv("FLASK_HOST", "0.0.0.0")
+    port = int(os.getenv("FLASK_PORT", "8000"))
+    create_app().run(host=host, port=port)
 
 
 if __name__ == "__main__":

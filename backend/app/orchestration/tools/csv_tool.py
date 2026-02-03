@@ -5,13 +5,15 @@ from langchain_core.tools import tool
 
 @tool("append_contact_csv", description="Guarda contacto en CSV con validaciones.")
 def append_contact_csv_handler(
-    filepath: str,
     nombres: str,
     apellidos: str | None,
     correo: str,
     telefono: str,
     delimiter: str = ","
 ) -> dict:
+    # Usar siempre el mismo archivo
+    filepath = "storage/info-table-genai.csv"
+    
     # Validar teléfono: exactamente 9 dígitos
     if not re.fullmatch(r"\d{9}", telefono):
         return {"ok": False, "error": "telefono_invalido", "detail": "Debe tener 9 dígitos."}

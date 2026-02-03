@@ -1,5 +1,5 @@
 from typing import Any, Dict, List
-
+from datetime import datetime
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 from pathlib import Path
@@ -19,7 +19,8 @@ def render_prompts(context: dict, file_prompt: str)-> str:
         return template.render(context)
 
 context_system_prompt = {
-     "project": "GenIA Portafolio"
+     "project": "GenIA Portafolio",
+     "fecha_actual": datetime.now().strftime("%d-%m-%Y")
 }
 system_prompt = render_prompts(context_system_prompt, "system_prompt.jinja")
 

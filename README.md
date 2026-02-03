@@ -65,16 +65,14 @@ uv sync
 ```bash
 cd backend
 source .venv/bin/activate
-uv run flask --app app.main:create_app run --host 0.0.0.0 --port 8000
+uv run flask --app main:create_app run --host 0.0.0.0 --port 8000
 ```
 
 Abre `http://localhost:8000` para ver el sitio.
 
-### CLI (opcional)
+### Script rapido (desde la raiz)
 ```bash
-cd backend
-source .venv/bin/activate
-uv run python main.py
+./run_local.sh
 ```
 
 ## API
@@ -86,6 +84,31 @@ Ejemplo:
 curl -X POST http://localhost:8000/api/v1/chat \
   -H 'Content-Type: application/json' \
   -d '{"message":"Hola","session_id":""}'
+```
+
+### Rate Limiting
+El sistema incluye limitación de uso por IP para evitar abuso:
+- Cada IP puede hacer hasta `MAX_QUESTIONS_PER_USER` preguntas (por defecto: 8)
+- Al alcanzar el límite, se debe esperar `RATE_LIMIT_WINDOW_HOURS` horas (por defecto: 2 horas)
+- El contador se muestra en el chat para que el usuario sepa cuántas preguntas le quedan
+- El endpoint retorna código HTTP 429 cuando se alcanza el límite
+
+Respuesta del endpoint `/chat`:
+```json
+{
+  "reply": "Respuesta del asistente",
+  "session_id": "abc123",
+  "remaining_questions": 5
+}
+```
+
+Cuando se alcanza el límite (HTTP 429):
+```json
+{
+  "error": "Has alcanzado el límite de 8 preguntas. Por favor espera 1h 45m para poder continuar.",
+  "remaining_questions": 0,
+  "rate_limited": true
+}
 ```
 
 ## Notas operativas

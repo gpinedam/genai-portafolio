@@ -17,6 +17,10 @@ class Settings:
 
         # PROJECT CONFIGURATION
         self.LIMIT_QUESTIONS = int(os.getenv("LIMIT_QUESTIONS", "10"))
+        
+        # RATE LIMITING
+        self.MAX_QUESTIONS_PER_USER = int(os.getenv("MAX_QUESTIONS_PER_USER", "8"))
+        self.RATE_LIMIT_WINDOW_HOURS = int(os.getenv("RATE_LIMIT_WINDOW_HOURS", "2"))
 
 # Instanciamos el objeto para que esté listo al importar
 settings = Settings()

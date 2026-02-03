@@ -330,6 +330,18 @@ body[data-view="contact"] .view-contact {
   flex-direction: column;
 }
 
+.question-counter {
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4CAF50;
+  transition: all 0.3s ease;
+}
+
 .composer {
   display: grid;
   grid-template-columns: 1fr 120px;

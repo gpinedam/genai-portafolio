@@ -51,6 +51,8 @@ source "$HOME/.local/bin/env"
 | `OPENAI_TEMPERATURE` | Temperatura del modelo | `0` |
 | `LIMIT_TOKENS` | Limite de tokens (uso interno) | `20000` |
 | `LIMIT_QUESTIONS` | Limite de preguntas (uso interno) | `10` |
+| `MAX_QUESTIONS_PER_USER` | Máximo de preguntas por usuario (rate limiting) | `8` |
+| `RATE_LIMIT_WINDOW_HOURS` | Horas de espera tras alcanzar el límite | `2` |
 | `FRONTEND_DIR` | Ruta absoluta al frontend estatico (opcional) | `/var/www/frontend` |
 
 ## Instalacion local (backend con uv)
@@ -85,6 +87,31 @@ Ejemplo:
 curl -X POST http://localhost:8000/api/v1/chat \
   -H 'Content-Type: application/json' \
   -d '{"message":"Hola","session_id":""}'
+```
+
+### Rate Limiting
+El sistema incluye limitación de uso por IP para evitar abuso:
+- Cada IP puede hacer hasta `MAX_QUESTIONS_PER_USER` preguntas (por defecto: 8)
+- Al alcanzar el límite, se debe esperar `RATE_LIMIT_WINDOW_HOURS` horas (por defecto: 2 horas)
+- El contador se muestra en el chat para que el usuario sepa cuántas preguntas le quedan
+- El endpoint retorna código HTTP 429 cuando se alcanza el límite
+
+Respuesta del endpoint `/chat`:
+```json
+{
+  "reply": "Respuesta del asistente",
+  "session_id": "abc123",
+  "remaining_questions": 5
+}
+```
+
+Cuando se alcanza el límite (HTTP 429):
+```json
+{
+  "error": "Has alcanzado el límite de 8 preguntas. Por favor espera 1h 45m para poder continuar.",
+  "remaining_questions": 0,
+  "rate_limited": true
+}
 ```
 
 ## Notas operativas

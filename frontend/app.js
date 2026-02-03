@@ -10,6 +10,8 @@ const projectsMarkdownEl = document.getElementById("projectsMarkdown");
 
 const API_URL = "/api/v1/chat";
 let sessionId = localStorage.getItem("session_id") || "";
+let remainingQuestions = null;
+let isRateLimited = false;
 
 const viewCopy = {
   home: {
@@ -358,9 +360,36 @@ function appendHomeMessage(text, role) {
   homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
 }
 
+function updateQuestionCounter() {
+  const counterEl = document.getElementById("questionCounter");
+  if (!counterEl) return;
+  
+  if (isRateLimited) {
+    counterEl.textContent = "⚠️ Chat bloqueado. Espera el tiempo indicado.";
+    counterEl.style.color = "#ff4444";
+  } else if (remainingQuestions !== null) {
+    counterEl.textContent = `📊 Preguntas restantes: ${remainingQuestions}`;
+    
+    // Cambiar color según las preguntas restantes
+    if (remainingQuestions <= 2) {
+      counterEl.style.color = "#ff4444";
+    } else if (remainingQuestions <= 4) {
+      counterEl.style.color = "#ffa500";
+    } else {
+      counterEl.style.color = "#4CAF50";
+    }
+  }
+}
+
 async function sendHomeMessage() {
   const text = homeInputEl.value.trim();
   if (!text) return;
+  
+  // Si está bloqueado, no permitir enviar
+  if (isRateLimited) {
+    appendHomeMessage("El chat está bloqueado temporalmente. Por favor espera el tiempo indicado.", "bot");
+    return;
+  }
 
   appendHomeMessage(text, "user");
   homeInputEl.value = "";
@@ -372,13 +401,34 @@ async function sendHomeMessage() {
       body: JSON.stringify({ message: text, session_id: sessionId })
     });
 
+    const data = await res.json();
+    
+    // Manejar rate limiting (HTTP 429)
+    if (res.status === 429) {
+      isRateLimited = true;
+      remainingQuestions = data.remaining_questions || 0;
+      appendHomeMessage(data.error || "Has alcanzado el límite de preguntas.", "bot");
+      updateQuestionCounter();
+      
+      // Deshabilitar el input y botón
+      homeInputEl.disabled = true;
+      homeSendBtn.disabled = true;
+      return;
+    }
+
     if (!res.ok) throw new Error("API error");
 
-    const data = await res.json();
     if (data.session_id) {
       sessionId = data.session_id;
       localStorage.setItem("session_id", sessionId);
     }
+    
+    // Actualizar contador de preguntas restantes
+    if (data.remaining_questions !== undefined) {
+      remainingQuestions = data.remaining_questions;
+      updateQuestionCounter();
+    }
+    
     appendHomeMessage(data.reply || "Sin respuesta", "bot");
   } catch (err) {
     appendHomeMessage("No pude conectar con el backend.", "bot");

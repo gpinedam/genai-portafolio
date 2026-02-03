@@ -90,8 +90,6 @@ backend/
 │   └── unit-tests/
 │       ├── test_rate_limiter.py    ← 🆕 Tests (5 tests ✅)
 │       └── conftest.py             ← ✏️ Fix de imports
-├── docs/
-│   └── RATE_LIMITING.md            ← 🆕 Documentación técnica
 └── .env-example                     ← ✏️ Nuevas variables
 
 frontend/
@@ -99,11 +97,16 @@ frontend/
 ├── index.html                       ← ✏️ Elemento contador
 └── styles.css                       ← ✏️ Estilos contador
 
+docs/
+├── RATE_LIMITING.md                 ← 🆕 Documentación técnica
+├── GUIA_RATE_LIMITING.md            ← 🆕 Guía de uso
+├── CHANGELOG_RATE_LIMITING.md       ← 🆕 Resumen de cambios
+├── RESUMEN_VISUAL.md                ← 🆕 Diagramas
+└── QUICK_START.md                   ← 🆕 Inicio rápido
+
 raíz/
 ├── README.md                        ← ✏️ Actualizado
-├── GUIA_RATE_LIMITING.md           ← 🆕 Guía de uso
-├── CHANGELOG_RATE_LIMITING.md      ← 🆕 Resumen de cambios
-└── test_rate_limiting.sh           ← 🆕 Script de pruebas
+└── test_rate_limiting.sh            ← 🆕 Script de pruebas
 
 
 ┌─────────────────────────────────────────────────────────────┐

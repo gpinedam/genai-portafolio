@@ -76,7 +76,7 @@ RATE_LIMIT_WINDOW_HOURS=1  # Bloqueo de 1 hora
 ## 📚 Más Información
 
 - [Guía Completa](GUIA_RATE_LIMITING.md)
-- [Documentación Técnica](backend/docs/RATE_LIMITING.md)
+- [Documentación Técnica](RATE_LIMITING.md)
 - [Changelog](CHANGELOG_RATE_LIMITING.md)
 - [Resumen Visual](RESUMEN_VISUAL.md)
 

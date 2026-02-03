@@ -199,6 +199,6 @@ Para implementar estadísticas, considera agregar:
 
 ## 📚 Documentación Adicional
 
-- [Documentación Técnica](backend/docs/RATE_LIMITING.md)
+- [Documentación Técnica](RATE_LIMITING.md)
 - [Changelog de Cambios](CHANGELOG_RATE_LIMITING.md)
-- [Tests Unitarios](backend/test/unit-tests/test_rate_limiter.py)
+- [Tests Unitarios](../backend/test/unit-tests/test_rate_limiter.py)

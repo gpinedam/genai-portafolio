@@ -19,7 +19,7 @@ Implementar un sistema de limitación de uso del chatbot para evitar abuso, perm
 - 5 tests que cubren todos los casos de uso
 - Todos los tests pasan exitosamente ✅
 
-### 3. `/backend/docs/RATE_LIMITING.md`
+### 3. `/docs/RATE_LIMITING.md`
 **Documentación completa** del sistema:
 - Descripción de componentes
 - Flujos de comportamiento

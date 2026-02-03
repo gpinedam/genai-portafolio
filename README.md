@@ -51,9 +51,6 @@ source "$HOME/.local/bin/env"
 | `OPENAI_TEMPERATURE` | Temperatura del modelo | `0` |
 | `LIMIT_TOKENS` | Limite de tokens (uso interno) | `20000` |
 | `LIMIT_QUESTIONS` | Limite de preguntas (uso interno) | `10` |
-| `MAX_QUESTIONS_PER_USER` | Máximo de preguntas por usuario (rate limiting) | `8` |
-| `RATE_LIMIT_WINDOW_HOURS` | Horas de espera tras alcanzar el límite | `2` |
-| `FRONTEND_DIR` | Ruta absoluta al frontend estatico (opcional) | `/var/www/frontend` |
 
 ## Instalacion local (backend con uv)
 ```bash

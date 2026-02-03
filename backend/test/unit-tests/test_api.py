@@ -41,4 +41,9 @@ def test_chat_success_returns_reply_and_session_id(client, monkeypatch):
     response = client.post("/api/v1/chat", json={"message": "Hola", "session_id": "test123"})
 
     assert response.status_code == 200
-    assert response.get_json() == {"reply": "Hola desde pruebas", "session_id": "test123"}
+    data = response.get_json()
+    assert data["reply"] == "Hola desde pruebas"
+    assert data["session_id"] == "test123"
+    assert "remaining_questions" in data
+    assert isinstance(data["remaining_questions"], int)
+    assert data["remaining_questions"] >= 0

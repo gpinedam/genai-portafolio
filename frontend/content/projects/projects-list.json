@@ -1,61 +1,97 @@
 {
   "projects": [
     {
-      "id": "proyecto-1",
+      "id": "GYS-RECLUT",
       "title": "Plataforma de Reclutamiento",
       "category": "Banca",
       "tags": ["IA Generativa", "Azure", "Python"],
       "image": "/assets/pj1.jpg",
-      "file": "proyecto-1.md",
+      "file": "GYS-RECLUT.md",
       "type": "sin-demo",
       "implementation": "enterprise",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
       "featured": true
     },
     {
-      "id": "proyecto-2",
+      "id": "GYS-LEGALDOC",
       "title": "Verificación de Documentos Legales",
       "category": "Finanzas",
       "tags": ["Azure Cognitive", "OCR", "Automatización"],
       "image": "/assets/pj2.jpg",
-      "file": "proyecto-2.md",
+      "file": "GYS-LEGALDOC.md",
       "type": "sin-demo",
       "implementation": "poc",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
       "featured": true
     },
     {
-      "id": "proyecto-3",
+      "id": "GYS-MEDICALDOC",
       "title": "Digitalización de Recetas Médicas",
       "category": "Salud",
       "tags": ["OCR", "LLM", "Azure"],
       "image": "/assets/pj3.jpg",
-      "file": "proyecto-3.md",
+      "file": "GYS-MEDICALDOC.md",
       "type": "sin-demo",
       "implementation": "mvp",
       "featured": false
     },
     {
-      "id": "proyecto-4",
+      "id": "INTERCORP-LINEASCRED",
       "title": "Asignación de Líneas de Crédito",
       "category": "Finanzas",
       "tags": ["Multiagente", "Predicción", "ML"],
       "image": "/assets/pj4.jpg",
-      "file": "proyecto-4.md",
+      "file": "INTERCORP-LINEASCRED.md",
       "type": "sin-demo",
       "implementation": "poc",
       "featured": false
     },
     {
-      "id": "proyecto-5",
+      "id": "INQUBE-CHATBOT",
       "title": "Chatbot Agrícola",
       "category": "Agricultura",
       "tags": ["GPT-4", "RAG", "Fine-tuning"],
-      "image": "/assets/pj5.jpg",
-      "file": "proyecto-5.md",
+      "image": "/assets/INQUBE-CHATBOT.jpg",
+      "file": "INQUBE-CHATBOT.md",
       "type": "con-demo",
       "implementation": "demo",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "featured": false
+    },
+    {
+      "id": "MICROSOFT-KYCMCP",
+      "title": "MCP para evaluacion de clientes en banca",
+      "category": "Agricultura",
+      "tags": ["GPT-4.1", "MCP", "BACKEND"],
+      "image": "/assets/MICROSOFT-KYCMCP.jpg",
+      "file": "MICROSOFT-KYCMCP.md",
+      "type": "sin-demo",
+      "implementation": "enterprise",
+      "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "featured": false
+    },
+    {
+      "id": "AJE-DEMO",
+      "title": "Agente documental de productos - AJE",
+      "category": "Consumo masivo",
+      "tags": ["GPT-4.1", "RAG", "Chromadb"],
+      "image": "/assets/AJE-DEMO.jpg",
+      "file": "AJE-DEMO.md",
+      "type": "con-demo",
+      "implementation": "demo",
+      "demoUrl": "https://www.youtube.com/embed/WjYUBQ4JOFU?si=H9GeYy5tHWgQ2kuB",
+      "featured": false
+    },
+    {
+      "id": "MAIA-REMAJU",
+      "title": "Agente de IA para Análisis Inmobiliario",
+      "category": "Público",
+      "tags": ["GPT-4o", "RAG", "Automatización"],
+      "image": "/assets/MAIA-REMAJU.jpg",
+      "file": "MAIA-REMAJU.md",
+      "type": "con-demo",
+      "implementation": "demo",
+      "demoUrl": "https://www.youtube.com/embed/AdbD0oMRjCQ?si=FiaVYXfqCwkDyRVp",
       "featured": false
     }
   ]

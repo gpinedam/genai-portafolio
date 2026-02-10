@@ -234,6 +234,16 @@ body[data-view="contact"] .view-contact {
   background: linear-gradient(135deg, #35e376 0%, #2db861 100%);
 }
 
+.btn-github {
+  background: linear-gradient(135deg, #333333 0%, #181818 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-github:hover {
+  background: linear-gradient(135deg, #444444 0%, #282828 100%);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 .btn-web {
   background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
 }

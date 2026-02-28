@@ -1,0 +1,53 @@
+{
+  "status": {
+    "available": true,
+    "text": "Disponible para nuevas oportunidades"
+  },
+  "meta": {
+    "name": "George Pineda",
+    "role": "AI Engineer",
+    "tagline": "Especializado en IA Generativa y agentes conversacionales"
+  },
+  "cv": {
+    "path": "assets/download/CV-PINEDA-GEORGE.pdf",
+    "filename": "CV-PINEDA-GEORGE.pdf"
+  },
+  "contact": {
+    "heading": "Hablemos \ud83d\udc4b",
+    "intro": "\u00bfBuscas un AI Engineer para tu equipo? Estoy disponible para proyectos de IA Generativa, agentes conversacionales y soluciones end-to-end.",
+    "responseNote": "Todos los mensajes son le\u00eddos personalmente \u00b7 Tiempo de respuesta < 24h",
+    "email": "gpineda@pucp.edu.pe",
+    "linkedin": {
+      "url": "http://www.linkedin.com/in/gwpinedam",
+      "display": "linkedin.com/in/gwpinedam"
+    },
+    "github": {
+      "url": "https://github.com/gpinedam",
+      "display": "github.com/gpinedam"
+    },
+    "phone": {
+      "url": "tel:+51922556245",
+      "display": "+51 922 556 245"
+    }
+  },
+  "tiles": [
+    { "icon": "\ud83d\udccd", "label": "Ubicaci\u00f3n", "value": "Lima, Per\u00fa" },
+    { "icon": "\ud83c\udf10", "label": "Idiomas", "value": "ES \u00b7 EN" },
+    { "icon": "\u2705", "label": "Disponibilidad", "value": "Inmediata", "highlight": true },
+    { "icon": "\ud83c\udfe2", "label": "Modalidad", "value": "Presencial / Remoto" },
+    { "icon": "\u26a1", "label": "Experiencia", "value": "2+ a\u00f1os en IA" },
+    { "icon": "\ud83c\udf93", "label": "Formaci\u00f3n", "value": "Ing. Mecatr\u00f3nica \u00b7 PUCP" }
+  ],
+  "stack": [
+    "Python",
+    "LangChain",
+    "FastAPI",
+    "OpenAI API",
+    "RAG",
+    "AI Agents",
+    "LangGraph",
+    "Azure OpenAI",
+    "PostgreSQL",
+    "Docker"
+  ]
+}

@@ -758,12 +758,95 @@ homeInputEl.addEventListener("keydown", (e) => {
 });
 
 // ====================================================
+// CONTACT VIEW — Populate from profile.json
+// ====================================================
+(async () => {
+  try {
+    const profile = await fetch("/content/profile.json").then(r => r.json());
+
+    // Status
+    const dot        = document.getElementById("contactStatusDot");
+    const statusText = document.getElementById("contactStatusText");
+    if (dot)        dot.dataset.available = profile.status.available;
+    if (statusText) statusText.textContent = profile.status.text;
+
+    // Heading & intro
+    const heading      = document.getElementById("contactHeading");
+    const intro        = document.getElementById("contactIntro");
+    const responseNote = document.getElementById("contactResponseNote");
+    if (heading)      heading.textContent = profile.contact.heading;
+    if (intro)        intro.textContent   = profile.contact.intro;
+    if (responseNote) responseNote.textContent = profile.contact.responseNote;
+
+    // CV button
+    const cvBtn = document.getElementById("cvDownloadBtn");
+    if (cvBtn) { cvBtn.href = profile.cv.path; cvBtn.download = profile.cv.filename; }
+
+    // Email
+    const emailLink  = document.getElementById("contactEmailLink");
+    const emailValue = document.getElementById("contactEmailValue");
+    const copyBtn    = document.getElementById("copyEmailBtn");
+    if (emailLink)  emailLink.href           = `mailto:${profile.contact.email}`;
+    if (emailValue) emailValue.textContent   = profile.contact.email;
+    if (copyBtn)    copyBtn.dataset.copy     = profile.contact.email;
+
+    // LinkedIn
+    const linkedinLink   = document.getElementById("contactLinkedinLink");
+    const linkedinAction = document.getElementById("contactLinkedinAction");
+    const linkedinValue  = document.getElementById("contactLinkedinValue");
+    if (linkedinLink)   linkedinLink.href         = profile.contact.linkedin.url;
+    if (linkedinAction) linkedinAction.href       = profile.contact.linkedin.url;
+    if (linkedinValue)  linkedinValue.textContent = profile.contact.linkedin.display;
+
+    // GitHub
+    const githubLink   = document.getElementById("contactGithubLink");
+    const githubAction = document.getElementById("contactGithubAction");
+    const githubValue  = document.getElementById("contactGithubValue");
+    if (githubLink)   githubLink.href         = profile.contact.github.url;
+    if (githubAction) githubAction.href       = profile.contact.github.url;
+    if (githubValue)  githubValue.textContent = profile.contact.github.display;
+
+    // Phone
+    const phoneLink   = document.getElementById("contactPhoneLink");
+    const phoneAction = document.getElementById("contactPhoneAction");
+    const phoneValue  = document.getElementById("contactPhoneValue");
+    if (phoneLink)   phoneLink.href         = profile.contact.phone.url;
+    if (phoneAction) phoneAction.href       = profile.contact.phone.url;
+    if (phoneValue)  phoneValue.textContent = profile.contact.phone.display;
+
+    // Tiles
+    const grid = document.getElementById("contactInfoGrid");
+    if (grid && profile.tiles) {
+      grid.innerHTML = profile.tiles.map(t => `
+        <div class="contact-info-tile${t.highlight ? ' contact-info-tile--available' : ''}">
+          <span class="contact-info-icon">${t.icon}</span>
+          <div class="contact-info-label">${t.label}</div>
+          <div class="contact-info-value">${t.value}</div>
+        </div>`).join("");
+    }
+
+    // Stack
+    const stackGrid = document.getElementById("contactStackGrid");
+    if (stackGrid && profile.stack) {
+      stackGrid.innerHTML = profile.stack
+        .map(tag => `<span class="contact-stack-tag">${tag}</span>`)
+        .join("");
+    }
+
+  } catch (e) {
+    const statusText = document.getElementById("contactStatusText");
+    if (statusText) statusText.textContent = "Disponible para nuevas oportunidades";
+  }
+})();
+
+// ====================================================
 // CONTACT VIEW — Copy email button
 // ====================================================
 const copyEmailBtn = document.getElementById("copyEmailBtn");
 if (copyEmailBtn) {
-  copyEmailBtn.addEventListener("click", () => {
-    const email = "gpineda@pucp.edu.pe";
+  copyEmailBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const email = copyEmailBtn.dataset.copy || "gpineda@pucp.edu.pe";
     navigator.clipboard.writeText(email).then(() => {
       copyEmailBtn.textContent = "✓ Copiado";
       setTimeout(() => { copyEmailBtn.textContent = "Copiar"; }, 2000);

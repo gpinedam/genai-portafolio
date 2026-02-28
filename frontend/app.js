@@ -241,105 +241,263 @@ function removeSuggestions() {
 
 loadQuickQuestions();
 
-// Cargar y mostrar proyectos dinámicamente
+// ============================================
+// PROJECTS — Carga dinámica, filtros, modal
+// ============================================
+
+let allProjects = [];
+let activeFilter = 'todos';
+
 async function loadProjects() {
   try {
     const response = await fetch("/content/projects/projects-list.json");
     if (!response.ok) throw new Error("No se pudo cargar projects-list.json");
-    
     const data = await response.json();
-    
-    // Separar proyectos por tipo
-    const projectsConDemo = data.projects.filter(p => p.type === "con-demo");
-    const projectsSinDemo = data.projects.filter(p => p.type === "sin-demo");
-    
-    renderProjectsGrid(projectsConDemo, "projectsGridDemo", true);
-    renderProjectsGrid(projectsSinDemo, "projectsGridNoDemo", false);
+    allProjects = data.projects || [];
+    buildFilterPills(allProjects);
+    renderProjects('todos');
   } catch (err) {
     console.error("Error cargando proyectos:", err);
   }
 }
 
-function renderProjectsGrid(projects, gridId, hasDemo) {
-  const grid = document.getElementById(gridId);
-  if (!grid) return;
-  
-  grid.innerHTML = "";
-  
-  projects.forEach(project => {
-    const card = document.createElement("div");
-    
-    // Construir clases de forma modular
-    const classes = ['project-card'];
-    if (hasDemo) classes.push('has-demo');
-    if (project.implementation) {
-      classes.push(`impl-${project.implementation}`);
-    }
-    card.className = classes.join(' ');
-    
-    // Determinar si hay imagen personalizada
-    const hasCustomImage = project.image && !project.image.includes('placeholder');
-    const imageStyle = hasCustomImage 
-      ? `style="background-image: url('${project.image}'); background-size: cover; background-position: center;"` 
-      : '';
-    const imageClass = hasCustomImage ? 'has-custom-image' : '';
-    
-    card.innerHTML = `
-      <div class="project-card-image ${imageClass}" ${imageStyle}></div>
-      <div class="project-card-content">
-        <div class="project-card-category">${project.category}</div>
-        <h3 class="project-card-title">${project.title}</h3>
-        <div class="project-card-tags">
-          ${project.tags.map(tag => `<span class="project-tag">${tag}</span>`).join('')}
-        </div>
-      </div>
-    `;
-    
-    card.addEventListener("click", () => openProjectModal(project));
-    grid.appendChild(card);
+function buildFilterPills(projects) {
+  const bar = document.getElementById("projectsFilterBar");
+  if (!bar) return;
+
+  const filters = [
+    { value: 'todos', label: 'Todos' },
+    { value: 'con-demo', label: '▶ Con Demo' },
+    ...Array.from(new Set(projects.map(p => p.category)))
+      .sort()
+      .map(cat => ({ value: cat, label: cat }))
+  ];
+
+  bar.innerHTML = filters.map(f => `
+    <button class="filter-pill${f.value === 'todos' ? ' active' : ''}" data-filter="${f.value}">
+      ${f.label}
+    </button>
+  `).join('');
+
+  bar.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      bar.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeFilter = pill.dataset.filter;
+      renderProjects(activeFilter);
+    });
   });
+
+  // View toggle (grid / list)
+  const toggleEl = document.getElementById('projectsViewToggle');
+  if (toggleEl) {
+    toggleEl.innerHTML = `
+      <button class="view-toggle-btn active" data-layout="grid" title="Vista cuadrícula">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+          <rect x="0" y="0" width="6" height="6" rx="1"/>
+          <rect x="8" y="0" width="6" height="6" rx="1"/>
+          <rect x="0" y="8" width="6" height="6" rx="1"/>
+          <rect x="8" y="8" width="6" height="6" rx="1"/>
+        </svg>
+      </button>
+      <button class="view-toggle-btn" data-layout="list" title="Vista lista">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+          <rect x="0" y="0" width="14" height="2.5" rx="1"/>
+          <rect x="0" y="5.75" width="14" height="2.5" rx="1"/>
+          <rect x="0" y="11.5" width="14" height="2.5" rx="1"/>
+        </svg>
+      </button>
+    `;
+    toggleEl.querySelectorAll('.view-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        toggleEl.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const grid = document.getElementById('projectsGrid');
+        if (grid) grid.classList.toggle('list-view', btn.dataset.layout === 'list');
+      });
+    });
+  }
+}
+
+const IMPL_LABELS = {
+  enterprise: { label: 'ENTERPRISE', color: '#ffd700' },
+  poc:        { label: 'POC',        color: '#4a9eff' },
+  mvp:        { label: 'MVP',        color: '#9b59b6' },
+  demo:       { label: 'DEMO',       color: '#f6c638' }
+};
+
+function renderProjects(filter) {
+  const grid = document.getElementById("projectsGrid");
+  const countEl = document.getElementById("projectsCount");
+  if (!grid) return;
+
+  let filtered = allProjects;
+  if (filter === 'con-demo') {
+    filtered = allProjects.filter(p => p.type === 'con-demo');
+  } else if (filter !== 'todos') {
+    filtered = allProjects.filter(p => p.category === filter);
+  }
+
+  // Featured primero
+  filtered = [
+    ...filtered.filter(p => p.featured),
+    ...filtered.filter(p => !p.featured)
+  ];
+
+  if (countEl) {
+    const total = allProjects.length;
+    const shown = filtered.length;
+    countEl.textContent = shown === total
+      ? `${total} proyectos`
+      : `${shown} de ${total} proyectos`;
+  }
+
+  grid.innerHTML = '';
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<p class="projects-empty">No hay proyectos en esta categoría.</p>';
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const delay = parseInt(entry.target.style.transitionDelay) || 0;
+        entry.target.classList.add('card-visible');
+        // Clear stagger delay after entry so hover transitions are instant
+        setTimeout(() => {
+          entry.target.style.transitionDelay = '0ms';
+        }, delay + 450);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  filtered.forEach((project, i) => {
+    const card = createProjectCard(project, i);
+    grid.appendChild(card);
+    observer.observe(card);
+  });
+}
+
+function createProjectCard(project, index) {
+  const card = document.createElement('div');
+  const impl = project.implementation || '';
+  const isFeatured = project.featured;
+  const hasDemo = project.type === 'con-demo';
+
+  const classes = ['project-card'];
+  if (impl) classes.push(`impl-${impl}`);
+  if (isFeatured) classes.push('featured');
+  if (hasDemo) classes.push('has-demo');
+  card.className = classes.join(' ');
+  // Stagger delay for IntersectionObserver entry animation
+  card.style.transitionDelay = `${index * 55}ms`;
+
+  const implInfo = IMPL_LABELS[impl];
+  // Expose impl color as CSS var for hover border
+  if (implInfo) card.style.setProperty('--card-impl-color', implInfo.color);
+
+  const hasCustomImage = project.image && !project.image.includes('placeholder');
+  const imageStyle = hasCustomImage
+    ? `style="background-image:url('${project.image}');background-size:cover;background-position:center;"`
+    : '';
+  const imageClass = hasCustomImage ? 'has-custom-image' : '';
+
+  const implBadge = implInfo
+    ? `<span class="impl-badge" style="--impl-color:${implInfo.color}">${implInfo.label}</span>`
+    : '';
+
+  card.innerHTML = `
+    <div class="project-card-image ${imageClass}" ${imageStyle}>
+      <div class="card-img-bottom">
+        <span class="project-card-category">${project.category}</span>
+        ${implBadge}
+      </div>
+      <div class="project-card-overlay">
+        <span class="overlay-cta">${hasDemo ? '▶ Ver Demo' : 'Ver Proyecto'}</span>
+      </div>
+    </div>
+    <div class="project-card-content">
+      <div class="card-list-meta">
+        <span class="project-card-category">${project.category}</span>
+        ${implBadge}
+      </div>
+      <h3 class="project-card-title">${project.title}</h3>
+      <div class="project-card-tags">
+        ${project.tags.slice(0, 3).map(tag => `<span class="project-tag">${tag}</span>`).join('')}
+      </div>
+    </div>
+  `;
+
+  card.addEventListener('click', () => openProjectModal(project));
+  return card;
 }
 
 async function openProjectModal(project) {
   const modal = document.getElementById("projectModal");
   const modalBody = document.getElementById("modalBody");
-  
   if (!modal || !modalBody) return;
-  
+
+  const impl = project.implementation || '';
+  const implInfo = IMPL_LABELS[impl];
+  const implBadge = implInfo
+    ? `<span class="impl-badge modal-impl-badge" style="--impl-color:${implInfo.color}">${implInfo.label}</span>`
+    : '';
+
+  const hasCustomImage = project.image && !project.image.includes('placeholder');
+  const headerBg = hasCustomImage
+    ? `background-image:url('${project.image}');background-size:cover;background-position:center;`
+    : '';
+
+  const hasDemo = project.type === 'con-demo' && project.demoUrl;
+
+  let htmlContent = `
+    <div class="modal-project-header" style="${headerBg}">
+      <div class="modal-project-header-overlay">
+        <div class="modal-project-header-badges">
+          ${implBadge}
+          <span class="modal-category-badge">${project.category}</span>
+          ${hasDemo ? '<span class="modal-demo-badge">▶ Con Demo</span>' : ''}
+        </div>
+        <h1 class="modal-project-title">${project.title}</h1>
+        <div class="modal-project-tags">
+          ${project.tags.map(tag => `<span class="project-tag">${tag}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (hasDemo) {
+    htmlContent += `
+      <div class="project-demo-video">
+        <iframe
+          src="${project.demoUrl}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    `;
+  }
+
+  modalBody.innerHTML = htmlContent + '<div class="modal-markdown-body"><p style="color:var(--text-muted);font-size:13px">Cargando...</p></div>';
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+
   try {
     const response = await fetch(`/content/projects/${project.file}`);
     if (!response.ok) throw new Error("No se pudo cargar el proyecto");
-    
     const markdown = await response.text();
-    
-    let htmlContent = "";
-    
-    // Si tiene demo, agregar el video de YouTube al inicio
-    if (project.type === "con-demo" && project.demoUrl) {
-      htmlContent += `
-        <div class="project-demo-video">
-          <iframe 
-            src="${project.demoUrl}" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
-        </div>
-      `;
+    const mdEl = modalBody.querySelector('.modal-markdown-body');
+    if (mdEl && window.marked && window.DOMPurify) {
+      mdEl.innerHTML = DOMPurify.sanitize(marked.parse(markdown));
+    } else if (mdEl) {
+      mdEl.textContent = markdown;
     }
-    
-    if (window.marked && window.DOMPurify) {
-      htmlContent += DOMPurify.sanitize(marked.parse(markdown));
-      modalBody.innerHTML = htmlContent;
-    } else {
-      modalBody.innerHTML = htmlContent + markdown;
-    }
-    
-    modal.classList.add("active");
-    document.body.style.overflow = "hidden";
   } catch (err) {
     console.error("Error cargando detalles del proyecto:", err);
-    modalBody.innerHTML = "<p>Error cargando el proyecto.</p>";
-    modal.classList.add("active");
+    const mdEl = modalBody.querySelector('.modal-markdown-body');
+    if (mdEl) mdEl.innerHTML = "<p>Error cargando el proyecto.</p>";
   }
 }
 
@@ -361,17 +519,12 @@ if (modalClose) {
 
 if (projectModal) {
   projectModal.addEventListener("click", (e) => {
-    if (e.target === projectModal) {
-      closeProjectModal();
-    }
+    if (e.target === projectModal) closeProjectModal();
   });
 }
 
-// Cerrar modal con tecla ESC
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeProjectModal();
-  }
+  if (e.key === "Escape") closeProjectModal();
 });
 
 loadProjects();

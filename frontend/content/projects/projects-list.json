@@ -10,7 +10,7 @@
       "type": "sin-demo",
       "implementation": "enterprise",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      "featured": true
+      "featured": false
     },
     {
       "id": "GYS-LEGALDOC",
@@ -22,7 +22,7 @@
       "type": "sin-demo",
       "implementation": "poc",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      "featured": true
+      "featured": false
     },
     {
       "id": "GYS-MEDICALDOC",
@@ -68,7 +68,7 @@
       "type": "sin-demo",
       "implementation": "enterprise",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      "featured": false
+      "featured": true
     },
     {
       "id": "AJE-DEMO",

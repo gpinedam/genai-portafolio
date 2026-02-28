@@ -77,7 +77,7 @@ body[data-view="contact"] .view-contact {
 
 .top {
   display: grid;
-  grid-template-columns: 200px 1fr auto auto;
+  grid-template-columns: 200px 1fr auto;
   grid-template-rows: auto auto;
   gap: 22px 16px;
   align-items: start;
@@ -85,14 +85,18 @@ body[data-view="contact"] .view-contact {
 
 .avatar-card {
   grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   background: var(--yellow);
-  padding: 12px;
+  padding: 10px;
   border-radius: var(--card-radius);
   box-shadow: 0 10px 0 rgba(0, 0, 0, 0.35);
 }
 
 .avatar-frame {
-  height: 220px;
+  flex: 1;
+  height: 210px;
   border-radius: 20px;
   overflow: hidden;
   background: #222;
@@ -121,31 +125,33 @@ body[data-view="contact"] .view-contact {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: var(--yellow);
-  color: #1a1005;
-  padding: 14px 20px;
-  border-radius: 999px;
-  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
+  gap: 7px;
+  background: var(--bg);
+  color: var(--yellow);
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(246, 198, 56, 0.25);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
   text-decoration: none;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  transition: all 0.2s ease;
-  align-self: center;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.08em;
   white-space: nowrap;
-  height: fit-content;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
 .cv-download-btn:hover {
-  filter: brightness(1.08);
+  background: var(--surface-2);
+  border-color: rgba(246, 198, 56, 0.55);
   transform: translateY(-2px);
-  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5);
 }
 
 .cv-download-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 
 .contact-buttons-wrapper {
@@ -1727,31 +1733,22 @@ body[data-view="contact"] .view-contact {
 /* Breakpoint para tablets y pantallas medianas */
 @media (max-width: 1100px) {
   .top {
-    grid-template-columns: 180px 1fr auto auto;
+    grid-template-columns: 180px 1fr auto;
     gap: 18px 14px;
   }
 
   .avatar-card {
-    padding: 10px;
+    padding: 8px;
+    gap: 8px;
   }
 
   .avatar-frame {
     height: 200px;
   }
 
-  .pill-nav {
-    padding: 9px;
-    gap: 9px;
-  }
-
-  .pill-nav a {
-    padding: 10px 10px;
-    font-size: 15px;
-  }
-
   .cv-download-btn {
-    padding: 16px 18px;
-    font-size: 13px;
+    font-size: 11px;
+    padding: 9px 12px;
   }
 
   .contact-btn {
@@ -1785,7 +1782,7 @@ body[data-view="contact"] .view-contact {
 
   .top {
     grid-template-columns: 140px 1fr auto;
-    grid-template-rows: auto auto auto auto auto;
+    grid-template-rows: auto auto auto auto;
     gap: 12px;
     align-items: start;
   }
@@ -1794,15 +1791,30 @@ body[data-view="contact"] .view-contact {
     grid-column: 1;
     grid-row: 1 / span 3;
     max-width: 140px;
-    padding: 8px;
+    padding: 6px;
+    gap: 7px;
     border-radius: 20px;
     box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
     align-self: stretch;
   }
 
   .avatar-frame {
-    height: 100%;
+    height: auto;
+    flex: 1;
     border-radius: 16px;
+  }
+
+  .cv-download-btn {
+    font-size: 9.5px;
+    padding: 7px 8px;
+    border-radius: 11px;
+    gap: 5px;
+    letter-spacing: 0.05em;
+  }
+
+  .cv-download-btn svg {
+    width: 11px;
+    height: 11px;
   }
 
   .pill-nav {
@@ -1827,22 +1839,9 @@ body[data-view="contact"] .view-contact {
     justify-content: center;
   }
 
-  .cv-download-btn {
-    grid-column: 2;
-    grid-row: 4;
-    padding: 10px 16px;
-    font-size: 13px;
-    border-radius: 18px;
-  }
-
-  .cv-download-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-
   .contact-buttons-wrapper {
     grid-column: 3;
-    grid-row: 1 / span 4;
+    grid-row: 1 / span 3;
     flex-direction: column;
     padding: 8px;
     align-self: stretch;
@@ -1865,7 +1864,7 @@ body[data-view="contact"] .view-contact {
 
   .intro-card {
     grid-column: 1 / -1;
-    grid-row: 5;
+    grid-row: 4;
     padding: 14px 18px;
     min-height: auto;
     height: auto;

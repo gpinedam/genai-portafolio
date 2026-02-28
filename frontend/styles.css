@@ -1,11 +1,28 @@
 :root {
-  --yellow: #f6c638;
+  /* Brand */
+  --yellow:      #f6c638;
   --yellow-deep: #efb81d;
-  --gray: #5a5a5a;
-  --blue: #3c6fa6;
-  --blue-deep: #2f5a86;
-  --paper: #f7f7f5;
-  --ink: #1f1f1f;
+
+  /* Dark navy surface system (matches chat panel) */
+  --bg:        #06111e;
+  --surface-0: #0a1520;
+  --surface-1: #0d1b2a;
+  --surface-2: #122436;
+  --surface-3: #1a3049;
+  --border:    rgba(255, 255, 255, 0.07);
+
+  /* Text */
+  --text-primary:   #e8eef5;
+  --text-secondary: #8da4bc;
+  --text-muted:     rgba(255, 255, 255, 0.38);
+
+  /* Legacy aliases (kept for any remaining references) */
+  --gray:     #5a5a5a;
+  --blue:     #0d1b2a;
+  --blue-deep: #0a1520;
+  --paper:    #06111e;
+  --ink:      #e8eef5;
+
   --card-radius: 28px;
   --font-ui: "Futura", "Avenir Next", "Trebuchet MS", sans-serif;
 }
@@ -17,12 +34,12 @@
 body {
   margin: 0;
   font-family: var(--font-ui);
-  color: var(--ink);
+  color: var(--text-primary);
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    var(--paper);
-  background-size: 16px 16px, 16px 16px, auto;
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(0deg,  rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    var(--bg);
+  background-size: 28px 28px, 28px 28px, auto;
 }
 
 .page {
@@ -71,7 +88,7 @@ body[data-view="contact"] .view-contact {
   background: var(--yellow);
   padding: 12px;
   border-radius: var(--card-radius);
-  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.35);
 }
 
 .avatar-frame {
@@ -90,12 +107,13 @@ body[data-view="contact"] .view-contact {
 
 .pill-nav {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  background: var(--yellow);
-  padding: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  background: var(--surface-2);
+  padding: 8px;
   border-radius: 999px;
-  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
   align-self: center;
 }
 
@@ -104,14 +122,15 @@ body[data-view="contact"] .view-contact {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #3c6fa6 0%, #2f5a86 100%);
-  color: #fff;
-  padding: 19px 20px;
+  background: var(--yellow);
+  color: #1a1005;
+  padding: 14px 20px;
   border-radius: 999px;
-  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
   text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
   transition: all 0.2s ease;
   align-self: center;
   white-space: nowrap;
@@ -119,9 +138,9 @@ body[data-view="contact"] .view-contact {
 }
 
 .cv-download-btn:hover {
-  background: linear-gradient(135deg, #4c7fb6 0%, #3f6a96 100%);
+  filter: brightness(1.08);
   transform: translateY(-2px);
-  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.35);
 }
 
 .cv-download-btn svg {
@@ -133,30 +152,36 @@ body[data-view="contact"] .view-contact {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 10px;
-  background: linear-gradient(135deg, #4a4a4a 0%, #5a5a5a 100%);
+  padding: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
   align-self: center;
 }
 
 .pill-nav a {
   text-align: center;
   text-decoration: none;
-  color: #2a230d;
+  color: var(--text-secondary);
   padding: 10px 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
 }
 
 .pill-nav a.active {
-  background: #fff;
-  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+  background: var(--yellow);
+  color: #1a1005;
+  box-shadow: 0 2px 8px rgba(246, 198, 56, 0.35);
 }
 
 .intro-card {
-  background: var(--gray);
-  color: #eaeaea;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
   padding: 20px 24px;
   border-radius: var(--card-radius);
   min-height: 120px;
@@ -166,16 +191,21 @@ body[data-view="contact"] .view-contact {
   justify-content: center;
   grid-column: 2 / -1;
   overflow: hidden;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
 .intro-card h2 {
   margin: 0 0 6px 0;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--yellow);
+  letter-spacing: 0.01em;
 }
 
 .intro-card p {
   margin: 6px 0 0 0;
-  line-height: 1.4;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .contact-buttons {
@@ -257,10 +287,15 @@ body[data-view="contact"] .view-contact {
   border-radius: 14px;
   margin-bottom: 10px;
   max-width: 85%;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .msg.bot {
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #c8d4e4;
+  border-radius: 4px 14px 14px 14px;
 }
 
 .msg.bot h1,
@@ -270,6 +305,7 @@ body[data-view="contact"] .view-contact {
   margin: 8px 0 6px 0;
   font-size: 1.1em;
   font-weight: 600;
+  color: #e8eef5;
 }
 
 .msg.bot p {
@@ -290,7 +326,7 @@ body[data-view="contact"] .view-contact {
 
 .msg.bot strong {
   font-weight: 600;
-  color: #1f1f1f;
+  color: #e8eef5;
 }
 
 .msg.bot em {
@@ -298,15 +334,16 @@ body[data-view="contact"] .view-contact {
 }
 
 .msg.bot code {
-  background: #e8e8e8;
+  background: rgba(255, 255, 255, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "Courier New", monospace;
   font-size: 0.9em;
+  color: var(--yellow);
 }
 
 .msg.bot pre {
-  background: #e8e8e8;
+  background: rgba(0, 0, 0, 0.3);
   padding: 10px;
   border-radius: 8px;
   overflow-x: auto;
@@ -316,102 +353,206 @@ body[data-view="contact"] .view-contact {
 .msg.bot pre code {
   background: none;
   padding: 0;
+  color: #c8d4e4;
 }
 
 .msg.bot blockquote {
-  border-left: 3px solid #3c6fa6;
+  border-left: 3px solid var(--yellow);
   padding-left: 12px;
   margin: 8px 0;
-  color: #5a5a5a;
+  color: rgba(200, 212, 228, 0.7);
   font-style: italic;
 }
 
 .msg.user {
-  background: #ffe69a;
+  background: var(--yellow);
+  color: #1a1005;
   margin-left: auto;
+  font-weight: 500;
+  border-radius: 14px 14px 4px 14px;
 }
 
 .messages {
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-  padding: 0;
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  background: #0d1b2a;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
-.question-counter {
-  padding: 10px 14px;
-  margin-bottom: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  text-align: center;
-  font-size: 14px;
+.messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* Legacy question-counter (kept for JS compat — now inside .chat-header) */
+.chat-counter {
+  font-size: 11px;
   font-weight: 600;
-  color: #4CAF50;
-  transition: all 0.3s ease;
+  color: #4caf50;
+  transition: color 0.3s ease;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .composer {
-  display: grid;
-  grid-template-columns: 1fr 120px;
-  gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #122436;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
 }
 
 .composer input {
-  border: none;
-  border-radius: 16px;
-  padding: 12px 14px;
-  font-size: 16px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e8eef5;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--font-ui);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.composer input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.composer input:focus {
+  border-color: rgba(246, 198, 56, 0.45);
 }
 
 .composer button {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
   border: none;
-  border-radius: 16px;
-  background: #646464;
-  color: #fff;
-  font-size: 16px;
+  border-radius: 12px;
+  background: var(--yellow);
+  color: #1a1005;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .composer button:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.1);
+  transform: scale(1.06);
+}
+
+.composer button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .home-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  align-items: stretch;
+  height: 530px;
+}
+
+/* ====================
+   CHAT HEADER
+   ==================== */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 16px;
+  background: #122436;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  border-radius: 20px 20px 0 0;
+}
+
+.chat-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4caf50;
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.7);
+  flex-shrink: 0;
+  animation: statusPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(76, 175, 80, 0.6); }
+  50% { box-shadow: 0 0 14px rgba(76, 175, 80, 1); }
+}
+
+.chat-header-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e8eef5;
+  letter-spacing: 0.03em;
+  flex: 1;
+}
+
+.chat-model-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--yellow);
+  background: rgba(246, 198, 56, 0.12);
+  border: 1px solid rgba(246, 198, 56, 0.28);
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .home-chat-shell {
-  background: var(--blue);
-  padding: 26px;
-  border-radius: 36px;
-  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.08);
+  background: #0a1520;
+  padding: 12px;
+  border-radius: 28px;
+  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .home-chat-panel {
-  background: var(--blue-deep);
-  border-radius: 26px;
-  padding: 18px;
-  height: 364px;
+  background: #0d1b2a;
+  border-radius: 20px;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0;
 }
 
 .quick-questions {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid var(--border);
 }
 
 .quick-questions-label {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   margin-bottom: 12px;
-  opacity: 0.9;
+  color: var(--text-secondary);
 }
 
 .quick-questions-bubbles {
@@ -421,41 +562,42 @@ body[data-view="contact"] .view-contact {
 }
 
 .question-bubble {
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
-  padding: 10px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 14px;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
   font-family: var(--font-ui);
 }
 
 .question-bubble:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: var(--surface-3);
+  border-color: rgba(246, 198, 56, 0.4);
+  color: var(--yellow);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .question-bubble:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .panel-shell {
-  background: var(--blue);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
   padding: 26px;
   border-radius: 36px;
-  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.28);
   min-height: 294px;
 }
 
 .panel-content {
-  color: #f2f2f2;
-  font-size: 16px;
+  color: var(--text-primary);
+  font-size: 15px;
   line-height: 1.6;
 }
 
@@ -482,12 +624,13 @@ body[data-view="contact"] .view-contact {
 }
 
 .projects-section-title {
-  color: var(--ink);
-  font-size: 24px;
-  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 22px;
+  font-weight: 700;
   margin: 0 0 20px 0;
   padding-bottom: 10px;
-  border-bottom: 3px solid var(--yellow);
+  border-bottom: 2px solid var(--yellow);
+  letter-spacing: 0.01em;
 }
 
 .projects-grid {
@@ -498,12 +641,12 @@ body[data-view="contact"] .view-contact {
 }
 
 .project-card {
-  background: var(--blue-deep);
+  background: var(--surface-1);
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   position: relative;
 }
 
@@ -549,8 +692,8 @@ body[data-view="contact"] .view-contact {
 }
 
 .project-card.impl-enterprise {
-  border: 3px solid #ffd700;
-  background: var(--blue-deep);
+  border: 2px solid #ffd700;
+  background: var(--surface-1);
   animation: enterpriseBreathe 4s ease-in-out infinite;
   position: relative;
   overflow: hidden;
@@ -580,11 +723,11 @@ body[data-view="contact"] .view-contact {
 }
 
 .project-card.impl-poc {
-  border: 3px solid #4a9eff;
+  border: 2px solid #4a9eff;
   box-shadow: 
-    0 4px 8px rgba(74, 158, 255, 0.4),
-    0 0 15px rgba(74, 158, 255, 0.25);
-  background: var(--blue-deep);
+    0 4px 8px rgba(74, 158, 255, 0.3),
+    0 0 15px rgba(74, 158, 255, 0.18);
+  background: var(--surface-1);
   position: relative;
   overflow: hidden;
 }
@@ -597,11 +740,11 @@ body[data-view="contact"] .view-contact {
 }
 
 .project-card.impl-mvp {
-  border: 3px solid #9b59b6;
+  border: 2px solid #9b59b6;
   box-shadow: 
-    0 4px 8px rgba(155, 89, 182, 0.4),
-    0 0 15px rgba(155, 89, 182, 0.25);
-  background: var(--blue-deep);
+    0 4px 8px rgba(155, 89, 182, 0.3),
+    0 0 15px rgba(155, 89, 182, 0.18);
+  background: var(--surface-1);
   position: relative;
   overflow: hidden;
 }
@@ -621,7 +764,7 @@ body[data-view="contact"] .view-contact {
 .project-card-image {
   width: 100%;
   height: 110px;
-  background: linear-gradient(135deg, var(--blue-deep) 0%, var(--blue) 100%);
+  background: linear-gradient(135deg, var(--surface-0) 0%, var(--surface-2) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -655,8 +798,8 @@ body[data-view="contact"] .view-contact {
 
 .project-card-content {
   padding: 12px;
-  color: #fff;
-  background: var(--blue-deep);
+  color: var(--text-primary);
+  background: var(--surface-1);
   position: relative;
   z-index: 2;
 }
@@ -711,7 +854,8 @@ body[data-view="contact"] .view-contact {
 }
 
 .project-modal-content {
-  background: #fff;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
   border-radius: 20px;
   max-width: 800px;
   width: 100%;
@@ -719,6 +863,8 @@ body[data-view="contact"] .view-contact {
   overflow-y: auto;
   position: relative;
   animation: slideUp 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
 }
 
 @keyframes fadeIn {
@@ -742,49 +888,62 @@ body[data-view="contact"] .view-contact {
   top: 0;
   right: 0;
   float: right;
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 300;
-  color: #666;
-  background: none;
+  color: var(--text-secondary);
+  background: var(--surface-2);
   border: none;
   cursor: pointer;
-  padding: 10px 20px;
+  padding: 8px 18px;
   z-index: 10;
   transition: color 0.2s;
+  border-radius: 0 0 0 12px;
 }
 
 .project-modal-close:hover {
-  color: #000;
+  color: var(--yellow);
 }
 
 .project-modal-body {
   padding: 20px 40px 40px;
-  color: var(--ink);
+  color: var(--text-primary);
 }
 
 .project-modal-body h1 {
-  color: var(--blue-deep);
+  color: var(--yellow);
   margin-top: 0;
-  font-size: 28px;
+  font-size: 26px;
 }
 
 .project-modal-body h2 {
-  color: var(--blue);
+  color: var(--text-primary);
   margin-top: 24px;
-  font-size: 22px;
+  font-size: 20px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
 }
 
 .project-modal-body h3 {
-  color: var(--gray);
-  font-size: 18px;
+  color: var(--text-secondary);
+  font-size: 17px;
 }
 
 .project-modal-body ul {
   line-height: 1.8;
+  color: var(--text-secondary);
 }
 
 .project-modal-body li {
   margin-bottom: 8px;
+}
+
+.project-modal-body strong {
+  color: var(--text-primary);
+}
+
+.project-modal-body p {
+  color: var(--text-secondary);
+  line-height: 1.7;
 }
 
 .project-demo-video {
@@ -814,35 +973,307 @@ body[data-view="contact"] .view-contact {
   font-weight: 600;
 }
 
-.contact-grid {
+/* ====================
+   TYPING INDICATOR
+   ==================== */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 14px;
+  border-radius: 4px 14px 14px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  max-width: 70px;
+  margin-bottom: 10px;
+}
+
+.typing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(200, 212, 228, 0.6);
+  animation: typingBounce 1.2s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+.msg.bot.streaming {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ====================
+   HOME PANEL — METRICS + STACK
+   ==================== */
+.impact-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 10px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.metric-card:hover {
+  border-color: rgba(246, 198, 56, 0.3);
+}
+
+.metric-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--yellow);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stack-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stack-group-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--yellow);
+  margin-bottom: 6px;
+}
+
+.stack-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stack-badge {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.stack-badge:hover {
+  background: var(--surface-3);
+  border-color: rgba(246, 198, 56, 0.3);
+  color: var(--yellow);
+}
+
+/* ====================
+   CONTACT VIEW
+   ==================== */
+.contact-page {
   display: grid;
   grid-template-columns: 2.2fr 1fr;
-  grid-template-rows: 1fr auto;
-  gap: 18px;
+  grid-template-rows: auto auto;
+  gap: 16px;
 }
 
 .contact-main {
-  background: #ffffff;
-  border-radius: 22px;
-  min-height: 260px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 28px 30px;
+  color: var(--text-primary);
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.28);
+}
+
+.contact-heading {
+  margin: 0 0 10px 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--yellow);
+}
+
+.contact-intro {
+  margin: 0 0 22px 0;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.contact-links-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact-link-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 11px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.contact-link-card svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.contact-link-card:hover {
+  background: var(--surface-3);
+  border-color: rgba(246, 198, 56, 0.35);
+  color: var(--yellow);
+  transform: translateX(4px);
 }
 
 .contact-side {
-  background: #9b9b9b;
-  border-radius: 22px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.28);
 }
 
-.contact-input {
-  background: #ffffff;
-  border-radius: 22px;
-  min-height: 90px;
+.contact-info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
 }
 
-.contact-button {
-  background: #646464;
-  border-radius: 22px;
-  min-height: 90px;
+.contact-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text-primary);
 }
+
+.contact-info-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.contact-info-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--yellow);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.contact-info-value {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.contact-email-bar {
+  background: var(--yellow);
+  border-radius: 20px;
+  padding: 15px 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
+}
+
+.contact-email-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1a1005;
+  white-space: nowrap;
+}
+
+.contact-email-value {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1005;
+}
+
+.contact-copy-btn {
+  background: #1a1005;
+  color: var(--yellow);
+  border: none;
+  border-radius: 10px;
+  padding: 7px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.contact-copy-btn:hover {
+  background: #000;
+  transform: translateY(-1px);
+}
+
+.contact-cv-bar {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
+}
+
+.contact-cta-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: opacity 0.2s;
+}
+
+.contact-cta-btn:hover {
+  opacity: 0.85;
+}
+
+/* ====================
+   OLD CONTACT GRID (unused)
+   ==================== */
 
 /* Breakpoint para tablets y pantallas medianas */
 @media (max-width: 1100px) {
@@ -905,7 +1336,7 @@ body[data-view="contact"] .view-contact {
 
   .top {
     grid-template-columns: 140px 1fr auto;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
     gap: 12px;
     align-items: start;
   }
@@ -916,7 +1347,7 @@ body[data-view="contact"] .view-contact {
     max-width: 140px;
     padding: 8px;
     border-radius: 20px;
-    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
     align-self: stretch;
   }
 
@@ -927,12 +1358,12 @@ body[data-view="contact"] .view-contact {
 
   .pill-nav {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 8px;
     border-radius: 20px;
-    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
   }
@@ -949,7 +1380,7 @@ body[data-view="contact"] .view-contact {
 
   .cv-download-btn {
     grid-column: 2;
-    grid-row: 3;
+    grid-row: 4;
     padding: 10px 16px;
     font-size: 13px;
     border-radius: 18px;
@@ -962,7 +1393,7 @@ body[data-view="contact"] .view-contact {
 
   .contact-buttons-wrapper {
     grid-column: 3;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
     flex-direction: column;
     padding: 8px;
     align-self: stretch;
@@ -985,7 +1416,7 @@ body[data-view="contact"] .view-contact {
 
   .intro-card {
     grid-column: 1 / -1;
-    grid-row: 4;
+    grid-row: 5;
     padding: 14px 18px;
     min-height: auto;
     height: auto;
@@ -1005,6 +1436,7 @@ body[data-view="contact"] .view-contact {
   .home-container {
     grid-template-columns: 1fr;
     gap: 16px;
+    height: auto;
   }
 
   /* Ocultar el panel de descripción en Home para priorizar el chat */
@@ -1024,7 +1456,7 @@ body[data-view="contact"] .view-contact {
   .panel-shell {
     padding: 18px;
     border-radius: 24px;
-    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3);
   }
 
   .panel-content {
@@ -1036,46 +1468,31 @@ body[data-view="contact"] .view-contact {
   }
 
   .home-chat-shell {
-    padding: 18px;
+    padding: 10px;
     border-radius: 24px;
-    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.14);
+    height: 480px;
   }
 
   .home-chat-panel {
-    padding: 14px;
-    height: 315px;
-    border-radius: 20px;
+    border-radius: 18px;
   }
 
   .messages {
     padding: 14px;
     flex: 1;
     min-height: 0;
-    border-radius: 16px;
     overflow-y: auto;
   }
 
   .msg {
     font-size: 14px;
     padding: 8px 12px;
-    border-radius: 12px;
-  }
-
-  .composer {
-    grid-template-columns: 1fr auto;
-    gap: 10px;
   }
 
   .composer input {
     padding: 10px 14px;
-    font-size: 15px;
-    border-radius: 14px;
-  }
-
-  .composer button {
-    padding: 10px 20px;
-    font-size: 15px;
-    border-radius: 14px;
+    font-size: 14px;
   }
 
   .contact-grid {
@@ -1088,6 +1505,25 @@ body[data-view="contact"] .view-contact {
   .contact-input,
   .contact-button {
     border-radius: 18px;
+  }
+
+  .contact-page {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-main {
+    border-radius: 20px;
+    padding: 20px 22px;
+  }
+
+  .contact-side {
+    border-radius: 20px;
+    padding: 16px;
+  }
+
+  .contact-email-bar,
+  .contact-cv-bar {
+    border-radius: 16px;
   }
 
   .projects-grid {
@@ -1123,7 +1559,7 @@ body[data-view="contact"] .view-contact {
 
   .top {
     grid-template-columns: 140px 1fr auto;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
     gap: 8px;
     align-items: start;
   }
@@ -1132,7 +1568,7 @@ body[data-view="contact"] .view-contact {
     max-width: 140px;
     padding: 8px;
     border-radius: 18px;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
     grid-column: 1;
     grid-row: 1 / span 3;
     align-self: stretch;
@@ -1147,9 +1583,9 @@ body[data-view="contact"] .view-contact {
     padding: 8px;
     gap: 8px;
     border-radius: 18px;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
     display: flex;
     flex-direction: column;
   }
@@ -1166,7 +1602,7 @@ body[data-view="contact"] .view-contact {
 
   .cv-download-btn {
     grid-column: 2;
-    grid-row: 3;
+    grid-row: 4;
     padding: 10px 16px;
     font-size: 12px;
     gap: 6px;
@@ -1179,7 +1615,7 @@ body[data-view="contact"] .view-contact {
 
   .contact-buttons-wrapper {
     grid-column: 3;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
     padding: 8px;
     border-radius: 18px;
     align-self: stretch;
@@ -1207,7 +1643,7 @@ body[data-view="contact"] .view-contact {
     padding: 12px 14px;
     border-radius: 16px;
     grid-column: 1 / -1;
-    grid-row: 4;
+    grid-row: 5;
   }
 
   .intro-card h2 {
@@ -1233,7 +1669,7 @@ body[data-view="contact"] .view-contact {
   .panel-shell {
     padding: 14px;
     border-radius: 20px;
-    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
   }
 
   .panel-content {
@@ -1246,23 +1682,20 @@ body[data-view="contact"] .view-contact {
   }
 
   .home-chat-shell {
-    padding: 14px;
+    padding: 8px;
     border-radius: 20px;
-    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
   }
 
   .home-chat-panel {
-    padding: 12px;
-    height: 336px;
+    height: 420px;
     border-radius: 16px;
-    gap: 10px;
   }
 
   .messages {
     padding: 12px;
     flex: 1;
     min-height: 0;
-    border-radius: 14px;
     overflow-y: auto;
   }
 
@@ -1270,22 +1703,10 @@ body[data-view="contact"] .view-contact {
     font-size: 13px;
     padding: 7px 10px;
     max-width: 90%;
-    border-radius: 10px;
-  }
-
-  .composer {
-    grid-template-columns: 1fr auto;
-    gap: 8px;
   }
 
   .composer input {
     padding: 9px 12px;
-    font-size: 14px;
-    border-radius: 12px;
-  }
-
-  .composer button {
-    padding: 9px 16px;
     font-size: 14px;
     border-radius: 12px;
   }

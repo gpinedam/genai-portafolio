@@ -4,8 +4,9 @@ from typing import Dict
 from uuid import uuid4
 from pathlib import Path
 import csv
+import json
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request, stream_with_context
 from langchain_openai import ChatOpenAI
 
 from app.config.base import settings
@@ -27,6 +28,7 @@ def _build_llm() -> ChatOpenAI:
         api_key=settings.API_KEY,
         model=settings.AI_MODEL,
         temperature=float(settings.TEMPERATURE),
+        streaming=True,  # required for token-level streaming via callbacks
     )
 
 
@@ -84,6 +86,57 @@ def chat() -> tuple:
         "session_id": session_id,
         "remaining_questions": remaining
     }), 200
+
+
+@api_v1.post("/chat/stream")
+def chat_stream() -> Response:
+    payload = request.get_json(silent=True) or {}
+    message = str(payload.get("message", "")).strip()
+
+    if not message:
+        return jsonify({"error": "message is required"}), 400
+
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    if client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+
+    can_proceed, error_message = _rate_limiter.check_limit(client_ip)
+    if not can_proceed:
+        remaining = _rate_limiter.get_remaining_questions(client_ip)
+        return jsonify({
+            "error": error_message,
+            "remaining_questions": remaining,
+            "rate_limited": True
+        }), 429
+
+    _rate_limiter.increment(client_ip)
+
+    session_id = payload.get("session_id") or uuid4().hex
+    remaining = _rate_limiter.get_remaining_questions(client_ip)
+    orchestrator = _get_orchestrator(session_id)
+
+    def generate():
+        # First event: send session metadata
+        yield (
+            "data: "
+            + json.dumps({"type": "session", "session_id": session_id, "remaining_questions": remaining})
+            + "\n\n"
+        )
+        try:
+            for token in orchestrator.chat_stream(message):
+                yield "data: " + json.dumps({"type": "chunk", "content": token}) + "\n\n"
+        except Exception as exc:
+            yield "data: " + json.dumps({"type": "error", "content": str(exc)}) + "\n\n"
+        yield "data: " + json.dumps({"type": "done"}) + "\n\n"
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @api_v1.get("/contacts")

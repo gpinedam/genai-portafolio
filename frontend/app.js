@@ -25,9 +25,8 @@ const viewCopy = {
     text: ""
   },
   contact: {
-    title: "Deja tu informacion",
-    text:
-      "Puedes chatear con el agente para brindar tu informacion, este la guardara y se mostrara."
+    title: "Contacto",
+    text: ""
   }
 };
 
@@ -136,35 +135,65 @@ async function loadViewCopyFromMarkdown() {
 }
 
 async function loadHomeMarkdown() {
-  if (!homeMarkdownEl) return;
-  
-  // Esperar a que se carguen los markdowns primero
+  // Replace with the rich visual panel
+  renderHomePanel();
+
+  // Still load markdown sources for intro text in header
   await loadViewCopyFromMarkdown();
-  
-  // Usar el contenido cargado desde markdown si existe
-  if (viewCopy.home.homePanelHtml) {
-    homeMarkdownEl.innerHTML = viewCopy.home.homePanelHtml;
-    return;
-  }
-  
-  // Si no, usar el contenido hardcoded
-  if (viewCopy.home.homePanel) {
-    homeMarkdownEl.textContent = viewCopy.home.homePanel;
-    return;
-  }
-  
-  // Fallback: intentar cargar directamente
-  if (!window.marked || !window.DOMPurify) return;
-  try {
-    const text = await fetchText("/content/home-page/home-page-home.md");
-    homeMarkdownEl.innerHTML = DOMPurify.sanitize(marked.parse(text));
-  } catch (err) {
-    homeMarkdownEl.textContent = "No se pudo cargar el contenido.";
-  }
 }
 
 loadHomeMarkdown();
 loadViewCopyFromMarkdown();
+
+// ====================================================
+// RICH HOME PANEL — Metrics + Tech Stack
+// ====================================================
+function renderHomePanel() {
+  if (!homeMarkdownEl) return;
+
+  homeMarkdownEl.innerHTML = `
+    <div class="impact-metrics">
+      <div class="metric-card">
+        <div class="metric-value">95%</div>
+        <div class="metric-label">Reducción tiempo de selección de CVs</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">99%</div>
+        <div class="metric-label">Ahorro validación documental</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">7+</div>
+        <div class="metric-label">Proyectos end-to-end entregados</div>
+      </div>
+    </div>
+
+    <div class="stack-section">
+      <div class="stack-group">
+        <div class="stack-group-label">LLMs &amp; Agentes</div>
+        <div class="stack-badges">
+          <span class="stack-badge">GPT-4.1</span>
+          <span class="stack-badge">LangChain</span>
+          <span class="stack-badge">RAG</span>
+          <span class="stack-badge">Fine-tuning</span>
+          <span class="stack-badge">MCP</span>
+          <span class="stack-badge">Multiagente</span>
+        </div>
+      </div>
+      <div class="stack-group">
+        <div class="stack-group-label">Cloud &amp; Backend</div>
+        <div class="stack-badges">
+          <span class="stack-badge">Azure OpenAI</span>
+          <span class="stack-badge">AWS</span>
+          <span class="stack-badge">FastAPI</span>
+          <span class="stack-badge">Flask</span>
+          <span class="stack-badge">Python</span>
+          <span class="stack-badge">ChromaDB</span>
+          <span class="stack-badge">Pinecone</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
 
 // Cargar y renderizar preguntas rápidas desde JSON
 async function loadQuickQuestions() {
@@ -363,29 +392,72 @@ function appendHomeMessage(text, role) {
 function updateQuestionCounter() {
   const counterEl = document.getElementById("questionCounter");
   if (!counterEl) return;
-  
+
   if (isRateLimited) {
-    counterEl.textContent = "⚠️ Chat bloqueado. Espera el tiempo indicado.";
-    counterEl.style.color = "#ff4444";
+    counterEl.textContent = "⚠ bloqueado";
+    counterEl.style.color = "#ff5555";
   } else if (remainingQuestions !== null) {
-    counterEl.textContent = `📊 Preguntas restantes: ${remainingQuestions}`;
-    
-    // Cambiar color según las preguntas restantes
     if (remainingQuestions <= 2) {
-      counterEl.style.color = "#ff4444";
+      counterEl.textContent = `${remainingQuestions} restante${remainingQuestions !== 1 ? "s" : ""}`;
+      counterEl.style.color = "#ff5555";
     } else if (remainingQuestions <= 4) {
+      counterEl.textContent = `${remainingQuestions} restantes`;
       counterEl.style.color = "#ffa500";
     } else {
-      counterEl.style.color = "#4CAF50";
+      counterEl.textContent = "";
+      counterEl.style.color = "";
     }
   }
 }
 
+// ====================================================
+// CHAT — Typing indicator helpers
+// ====================================================
+function showTypingIndicator() {
+  const div = document.createElement("div");
+  div.className = "typing-indicator";
+  div.id = "typingIndicator";
+  div.innerHTML = `
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+  `;
+  homeMessagesEl.appendChild(div);
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+  return div;
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById("typingIndicator");
+  if (el) el.remove();
+}
+
+function createStreamingBotMessage() {
+  removeTypingIndicator();
+  const div = document.createElement("div");
+  div.className = "msg bot streaming";
+  homeMessagesEl.appendChild(div);
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+  return div;
+}
+
+function finalizeStreamingMessage(msgEl, fullText) {
+  msgEl.classList.remove("streaming");
+  if (window.marked && window.DOMPurify) {
+    msgEl.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
+  } else {
+    msgEl.textContent = fullText;
+  }
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+}
+
+// ====================================================
+// CHAT — SSE streaming send
+// ====================================================
 async function sendHomeMessage() {
   const text = homeInputEl.value.trim();
   if (!text) return;
-  
-  // Si está bloqueado, no permitir enviar
+
   if (isRateLimited) {
     appendHomeMessage("El chat está bloqueado temporalmente. Por favor espera el tiempo indicado.", "bot");
     return;
@@ -393,52 +465,115 @@ async function sendHomeMessage() {
 
   appendHomeMessage(text, "user");
   homeInputEl.value = "";
+  homeInputEl.disabled = true;
+  homeSendBtn.disabled = true;
+  showTypingIndicator();
 
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch("/api/v1/chat/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text, session_id: sessionId })
     });
 
-    const data = await res.json();
-    
-    // Manejar rate limiting (HTTP 429)
+    // Rate limited—raw JSON response, not a stream
     if (res.status === 429) {
+      removeTypingIndicator();
+      const data = await res.json();
       isRateLimited = true;
-      remainingQuestions = data.remaining_questions || 0;
-      appendHomeMessage(data.error || "Has alcanzado el límite de preguntas.", "bot");
+      remainingQuestions = data.remaining_questions ?? 0;
       updateQuestionCounter();
-      
-      // Deshabilitar el input y botón
-      homeInputEl.disabled = true;
-      homeSendBtn.disabled = true;
+      appendHomeMessage(
+        data.error || "Has alcanzado el límite de preguntas. ¡Contáctame directamente!",
+        "bot"
+      );
       return;
     }
 
-    if (!res.ok) throw new Error("API error");
+    if (!res.ok || !res.body) {
+      removeTypingIndicator();
+      appendHomeMessage("No pude conectar con el backend.", "bot");
+      return;
+    }
 
-    if (data.session_id) {
-      sessionId = data.session_id;
-      localStorage.setItem("session_id", sessionId);
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let done = false;
+    let msgEl = null;
+    let fullText = "";
+
+    while (!done) {
+      const { done: streamDone, value } = await reader.read();
+      if (streamDone) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop(); // keep incomplete tail
+
+      for (const part of parts) {
+        if (!part.startsWith("data: ")) continue;
+        try {
+          const event = JSON.parse(part.slice(6));
+
+          if (event.type === "session") {
+            sessionId = event.session_id;
+            localStorage.setItem("session_id", sessionId);
+            remainingQuestions = event.remaining_questions;
+            updateQuestionCounter();
+
+          } else if (event.type === "chunk") {
+            fullText += event.content;
+            if (!msgEl) msgEl = createStreamingBotMessage(); // first token: swap indicator
+            msgEl.textContent = fullText;
+            homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+
+          } else if (event.type === "done") {
+            done = true;
+            if (msgEl) finalizeStreamingMessage(msgEl, fullText);
+            else { removeTypingIndicator(); }
+
+          } else if (event.type === "error") {
+            done = true;
+            if (!msgEl) msgEl = createStreamingBotMessage();
+            finalizeStreamingMessage(msgEl, event.content || "Error al generar la respuesta.");
+          }
+        } catch (_) {}
+      }
     }
-    
-    // Actualizar contador de preguntas restantes
-    if (data.remaining_questions !== undefined) {
-      remainingQuestions = data.remaining_questions;
-      updateQuestionCounter();
-    }
-    
-    appendHomeMessage(data.reply || "Sin respuesta", "bot");
+
+    if (!done && fullText && msgEl) finalizeStreamingMessage(msgEl, fullText);
+
   } catch (err) {
+    removeTypingIndicator();
     appendHomeMessage("No pude conectar con el backend.", "bot");
+  } finally {
+    homeInputEl.disabled = false;
+    homeSendBtn.disabled = false;
+    homeInputEl.focus();
   }
 }
 
 homeSendBtn.addEventListener("click", sendHomeMessage);
 homeInputEl.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendHomeMessage();
+  if (e.key === "Enter" && !homeInputEl.disabled) sendHomeMessage();
 });
+
+// ====================================================
+// CONTACT VIEW — Copy email button
+// ====================================================
+const copyEmailBtn = document.getElementById("copyEmailBtn");
+if (copyEmailBtn) {
+  copyEmailBtn.addEventListener("click", () => {
+    const email = "gpineda@pucp.edu.pe";
+    navigator.clipboard.writeText(email).then(() => {
+      copyEmailBtn.textContent = "✓ Copiado";
+      setTimeout(() => { copyEmailBtn.textContent = "Copiar"; }, 2000);
+    }).catch(() => {
+      copyEmailBtn.textContent = "Copiar";
+    });
+  });
+}
 
 // Funcionalidad para las burbujas de preguntas rápidas
 const quickQuestionsContainer = document.getElementById("quickQuestions");

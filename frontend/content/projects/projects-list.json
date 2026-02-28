@@ -61,7 +61,7 @@
     {
       "id": "MICROSOFT-KYCMCP",
       "title": "MCP para evaluacion de clientes en banca",
-      "category": "Agricultura",
+      "category": "Finanzas",
       "tags": ["GPT-4.1", "MCP", "BACKEND"],
       "image": "/assets/MICROSOFT-KYCMCP.jpg",
       "file": "MICROSOFT-KYCMCP.md",

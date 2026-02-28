@@ -846,7 +846,7 @@ const copyEmailBtn = document.getElementById("copyEmailBtn");
 if (copyEmailBtn) {
   copyEmailBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    const email = copyEmailBtn.dataset.copy || "gpineda@pucp.edu.pe";
+    const email = copyEmailBtn.dataset.copy || "gwpinedam@gmail.com";
     navigator.clipboard.writeText(email).then(() => {
       copyEmailBtn.textContent = "✓ Copiado";
       setTimeout(() => { copyEmailBtn.textContent = "Copiar"; }, 2000);

@@ -399,8 +399,23 @@ body[data-view="contact"] .view-contact {
   font-weight: 600;
   color: #4caf50;
   transition: color 0.3s ease;
-  margin-left: auto;
   white-space: nowrap;
+}
+
+.chat-token-live {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--yellow);
+  font-family: monospace;
+  letter-spacing: 0.04em;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.chat-token-live:not(:empty) {
+  opacity: 0.85;
 }
 
 .composer {
@@ -465,7 +480,7 @@ body[data-view="contact"] .view-contact {
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   align-items: stretch;
-  height: 530px;
+  height: 580px;
 }
 
 /* ====================
@@ -540,59 +555,73 @@ body[data-view="contact"] .view-contact {
   gap: 0;
 }
 
-.quick-questions {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
+/* Suggestion cards — injected into messages area, disappear on first interaction */
+.suggestions-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 6px;
+  margin-bottom: 4px;
+  animation: suggestFadeIn 0.3s ease;
 }
 
-.quick-questions-label {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 12px;
-  color: var(--text-secondary);
+@keyframes suggestFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.quick-questions-bubbles {
+.suggestion-card {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.question-bubble {
+  align-items: center;
+  gap: 8px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  color: var(--text-secondary);
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 13px;
+  border-radius: 12px;
+  padding: 9px 13px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
   font-family: var(--font-ui);
+  text-align: left;
+  transition: all 0.18s ease;
+  width: 100%;
 }
 
-.question-bubble:hover {
+.suggestion-emoji {
+  font-size: 15px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.suggestion-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.suggestion-card:hover {
   background: var(--surface-3);
-  border-color: rgba(246, 198, 56, 0.4);
-  color: var(--yellow);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border-color: rgba(246, 198, 56, 0.35);
 }
 
-.question-bubble:active {
-  transform: translateY(0);
+.suggestion-card:hover .suggestion-label {
+  color: var(--text-primary);
+}
+
+.suggestion-card:active {
+  transform: scale(0.98);
 }
 
 .panel-shell {
   background: var(--surface-0);
   border: 1px solid var(--border);
-  padding: 26px;
+  padding: 22px 24px;
   border-radius: 36px;
   box-shadow: 0 14px 0 rgba(0, 0, 0, 0.28);
-  min-height: 294px;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
 }
 
 .panel-content {
@@ -1009,21 +1038,30 @@ body[data-view="contact"] .view-contact {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Response metadata badge after bot messages */
+.msg-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin: -6px 0 10px 4px;
+  font-family: monospace;
+  letter-spacing: 0.02em;
+}
+
 /* ====================
    HOME PANEL — METRICS + STACK
    ==================== */
 .impact-metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
 .metric-card {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 12px 10px;
+  padding: 10px 8px;
   text-align: center;
   transition: border-color 0.2s;
 }
@@ -1051,7 +1089,25 @@ body[data-view="contact"] .view-contact {
 .stack-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
+}
+
+.stack-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.stack-cat {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--yellow);
+  min-width: 36px;
+  flex-shrink: 0;
+  opacity: 0.9;
 }
 
 .stack-group-label {
@@ -1084,6 +1140,42 @@ body[data-view="contact"] .view-contact {
   background: var(--surface-3);
   border-color: rgba(246, 198, 56, 0.3);
   color: var(--yellow);
+}
+
+/* Industries section */
+.industries-section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.industries-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.industry-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  cursor: default;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.industry-card:hover {
+  border-color: rgba(246, 198, 56, 0.35);
+  color: var(--text-primary);
+  background: var(--surface-3);
 }
 
 /* ====================

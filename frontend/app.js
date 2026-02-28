@@ -168,28 +168,36 @@ function renderHomePanel() {
     </div>
 
     <div class="stack-section">
-      <div class="stack-group">
-        <div class="stack-group-label">LLMs &amp; Agentes</div>
-        <div class="stack-badges">
-          <span class="stack-badge">GPT-4.1</span>
-          <span class="stack-badge">LangChain</span>
-          <span class="stack-badge">RAG</span>
-          <span class="stack-badge">Fine-tuning</span>
-          <span class="stack-badge">MCP</span>
-          <span class="stack-badge">Multiagente</span>
-        </div>
+      <div class="stack-row">
+        <span class="stack-cat">LLMs</span>
+        <span class="stack-badge">GPT-4.1</span>
+        <span class="stack-badge">LangChain</span>
+        <span class="stack-badge">RAG</span>
+        <span class="stack-badge">Fine-tuning</span>
+        <span class="stack-badge">MCP</span>
+        <span class="stack-badge">Multiagente</span>
       </div>
-      <div class="stack-group">
-        <div class="stack-group-label">Cloud &amp; Backend</div>
-        <div class="stack-badges">
-          <span class="stack-badge">Azure OpenAI</span>
-          <span class="stack-badge">AWS</span>
-          <span class="stack-badge">FastAPI</span>
-          <span class="stack-badge">Flask</span>
-          <span class="stack-badge">Python</span>
-          <span class="stack-badge">ChromaDB</span>
-          <span class="stack-badge">Pinecone</span>
-        </div>
+      <div class="stack-row">
+        <span class="stack-cat">Cloud</span>
+        <span class="stack-badge">Azure OpenAI</span>
+        <span class="stack-badge">AWS</span>
+        <span class="stack-badge">FastAPI</span>
+        <span class="stack-badge">Flask</span>
+        <span class="stack-badge">Python</span>
+        <span class="stack-badge">ChromaDB</span>
+        <span class="stack-badge">Pinecone</span>
+      </div>
+    </div>
+
+    <div class="industries-section">
+      <div class="stack-group-label">Industrias</div>
+      <div class="industries-grid">
+        <div class="industry-card">🏦 <span>Banca</span></div>
+        <div class="industry-card">🏥 <span>Salud</span></div>
+        <div class="industry-card">⚖️ <span>Legal</span></div>
+        <div class="industry-card">🌱 <span>Agricultura</span></div>
+        <div class="industry-card">💼 <span>Reclutamiento</span></div>
+        <div class="industry-card">🤝 <span>Gobierno</span></div>
       </div>
     </div>
   `;
@@ -209,18 +217,26 @@ async function loadQuickQuestions() {
 }
 
 function renderQuickQuestions(questions) {
-  const container = document.getElementById("quickQuestions");
-  if (!container) return;
-  
-  container.innerHTML = "";
-  
+  // Inject suggestion cards directly into the messages area
+  const block = document.createElement("div");
+  block.className = "suggestions-block";
+  block.id = "suggestionsBlock";
+
   questions.forEach(q => {
-    const button = document.createElement("button");
-    button.className = "question-bubble";
-    button.dataset.question = q.question;
-    button.textContent = `${q.emoji} ${q.label}`;
-    container.appendChild(button);
+    const btn = document.createElement("button");
+    btn.className = "suggestion-card";
+    btn.dataset.question = q.question;
+    btn.innerHTML = `<span class="suggestion-emoji">${q.emoji}</span><span class="suggestion-label">${q.label}</span>`;
+    block.appendChild(btn);
   });
+
+  homeMessagesEl.appendChild(block);
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+}
+
+function removeSuggestions() {
+  const el = document.getElementById("suggestionsBlock");
+  if (el) el.remove();
 }
 
 loadQuickQuestions();
@@ -451,6 +467,15 @@ function finalizeStreamingMessage(msgEl, fullText) {
   homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
 }
 
+function addResponseMeta(msgEl, elapsedMs, tokens) {
+  const sec = (elapsedMs / 1000).toFixed(1);
+  const meta = document.createElement("div");
+  meta.className = "msg-meta";
+  meta.textContent = `GPT-4.1 · ${sec}s · ${tokens} tok`;
+  msgEl.insertAdjacentElement("afterend", meta);
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+}
+
 // ====================================================
 // CHAT — SSE streaming send
 // ====================================================
@@ -463,6 +488,7 @@ async function sendHomeMessage() {
     return;
   }
 
+  removeSuggestions();
   appendHomeMessage(text, "user");
   homeInputEl.value = "";
   homeInputEl.disabled = true;
@@ -496,6 +522,8 @@ async function sendHomeMessage() {
       return;
     }
 
+    const sendTime = Date.now();
+    let tokenCount = 0;
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
@@ -524,17 +552,28 @@ async function sendHomeMessage() {
 
           } else if (event.type === "chunk") {
             fullText += event.content;
-            if (!msgEl) msgEl = createStreamingBotMessage(); // first token: swap indicator
+            tokenCount++;
+            const tl = document.getElementById("tokenLive");
+            if (tl) tl.textContent = tokenCount + " tok";
+            if (!msgEl) msgEl = createStreamingBotMessage();
             msgEl.textContent = fullText;
             homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
 
           } else if (event.type === "done") {
             done = true;
-            if (msgEl) finalizeStreamingMessage(msgEl, fullText);
-            else { removeTypingIndicator(); }
+            const tl = document.getElementById("tokenLive");
+            if (tl) tl.textContent = "";
+            if (msgEl) {
+              finalizeStreamingMessage(msgEl, fullText);
+              addResponseMeta(msgEl, Date.now() - sendTime, tokenCount);
+            } else {
+              removeTypingIndicator();
+            }
 
           } else if (event.type === "error") {
             done = true;
+            const tl = document.getElementById("tokenLive");
+            if (tl) tl.textContent = "";
             if (!msgEl) msgEl = createStreamingBotMessage();
             finalizeStreamingMessage(msgEl, event.content || "Error al generar la respuesta.");
           }
@@ -542,7 +581,13 @@ async function sendHomeMessage() {
       }
     }
 
-    if (!done && fullText && msgEl) finalizeStreamingMessage(msgEl, fullText);
+    if (!done && fullText && msgEl) {
+      const tl = document.getElementById("tokenLive");
+      if (tl) tl.textContent = "";
+      removeToolCallPill();
+      finalizeStreamingMessage(msgEl, fullText);
+      addResponseMeta(msgEl, Date.now() - sendTime, tokenCount);
+    }
 
   } catch (err) {
     removeTypingIndicator();
@@ -575,17 +620,15 @@ if (copyEmailBtn) {
   });
 }
 
-// Funcionalidad para las burbujas de preguntas rápidas
-const quickQuestionsContainer = document.getElementById("quickQuestions");
-if (quickQuestionsContainer) {
-  quickQuestionsContainer.addEventListener("click", (e) => {
-    const bubble = e.target.closest(".question-bubble");
-    if (bubble) {
-      const question = bubble.dataset.question;
-      if (question && homeInputEl) {
-        homeInputEl.value = question;
-        sendHomeMessage();
-      }
+// Suggestion cards click handler (delegated on messages area)
+homeMessagesEl.addEventListener("click", (e) => {
+  const card = e.target.closest(".suggestion-card");
+  if (card) {
+    const question = card.dataset.question;
+    if (question && homeInputEl) {
+      removeSuggestions();
+      homeInputEl.value = question;
+      sendHomeMessage();
     }
-  });
-}
+  }
+});

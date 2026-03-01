@@ -1023,6 +1023,7 @@ body[data-view="contact"] .view-contact {
 
 .projects-grid:not(.list-view) .project-card.featured .project-card-image {
   width: 180px;
+  background-position: top center !important;
 }
 
 .projects-grid:not(.list-view) .card-img-bottom {

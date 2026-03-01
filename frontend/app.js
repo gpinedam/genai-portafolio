@@ -136,7 +136,7 @@ async function loadViewCopyFromMarkdown() {
 
 async function loadHomeMarkdown() {
   // Replace with the rich visual panel
-  renderHomePanel();
+  await renderHomePanel();
 
   // Still load markdown sources for intro text in header
   await loadViewCopyFromMarkdown();
@@ -146,61 +146,79 @@ loadHomeMarkdown();
 loadViewCopyFromMarkdown();
 
 // ====================================================
-// RICH HOME PANEL — Metrics + Tech Stack
+// RICH HOME PANEL — Metrics + Tech Stack (data-driven)
 // ====================================================
-function renderHomePanel() {
+async function renderHomePanel() {
   if (!homeMarkdownEl) return;
 
+  let data = { metrics: [], stack: [], industries: [] };
+  try {
+    const res = await fetch("/content/home-panel.json");
+    if (res.ok) data = await res.json();
+  } catch (e) {
+    console.error("Error cargando home-panel.json:", e);
+  }
+
+  const metricsHtml = data.metrics.map(m => `
+    <div class="metric-card">
+      <div class="metric-value">${m.value}</div>
+      <div class="metric-label">${m.label}</div>
+    </div>`).join("");
+
+  const stackData = data.stack.map(row => {
+    const skills = row.skills || [];
+    const avg = skills.length
+      ? (skills.reduce((sum, s) => sum + s.level, 0) / skills.length).toFixed(1)
+      : '—';
+    const skillsHtml = skills.map(s => {
+      const filled = s.level;
+      const dots = Array.from({length: 5}, (_, i) =>
+        `<span class="dot ${i < filled ? 'filled' : 'empty'}"></span>`
+      ).join('');
+      return `<div class="skill-row"><span class="skill-name">${s.name}</span><div class="skill-dots">${dots}</div></div>`;
+    }).join('');
+    return { category: row.category, avg, skillsHtml };
+  });
+
+  const tabNavHtml = stackData.map((row, i) => `
+    <button class="skill-tab${i === 0 ? ' active' : ''}" data-tab="${i}">
+      ${row.category}
+      <span class="tab-avg">${row.avg}<span class="tab-avg-denom">/5</span></span>
+    </button>`).join('');
+
+  const tabPanelsHtml = stackData.map((row, i) => `
+    <div class="skill-panel${i === 0 ? ' active' : ''}" data-panel="${i}">
+      <div class="skill-grid">${row.skillsHtml}</div>
+    </div>`).join('');
+
+  const stackHtml = `
+    <div class="skill-tabs">
+      <div class="skill-tabs-nav">${tabNavHtml}</div>
+      <div class="skill-tabs-body">${tabPanelsHtml}</div>
+    </div>`;
+
+  const industriesHtml = data.industries.map(ind => `
+    <div class="industry-card">${ind.emoji} <span>${ind.label}</span></div>`).join("");
+
   homeMarkdownEl.innerHTML = `
-    <div class="impact-metrics">
-      <div class="metric-card">
-        <div class="metric-value">95%</div>
-        <div class="metric-label">Reducción tiempo de selección de CVs</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-value">99%</div>
-        <div class="metric-label">Ahorro validación documental</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-value">7+</div>
-        <div class="metric-label">Proyectos end-to-end entregados</div>
-      </div>
-    </div>
-
-    <div class="stack-section">
-      <div class="stack-row">
-        <span class="stack-cat">LLMs</span>
-        <span class="stack-badge">GPT-4.1</span>
-        <span class="stack-badge">LangChain</span>
-        <span class="stack-badge">RAG</span>
-        <span class="stack-badge">Fine-tuning</span>
-        <span class="stack-badge">MCP</span>
-        <span class="stack-badge">Multiagente</span>
-      </div>
-      <div class="stack-row">
-        <span class="stack-cat">Cloud</span>
-        <span class="stack-badge">Azure OpenAI</span>
-        <span class="stack-badge">AWS</span>
-        <span class="stack-badge">FastAPI</span>
-        <span class="stack-badge">Flask</span>
-        <span class="stack-badge">Python</span>
-        <span class="stack-badge">ChromaDB</span>
-        <span class="stack-badge">Pinecone</span>
-      </div>
-    </div>
-
+    <div class="impact-metrics">${metricsHtml}</div>
+    <div class="skill-table">${stackHtml}</div>
     <div class="industries-section">
       <div class="stack-group-label">Industrias</div>
-      <div class="industries-grid">
-        <div class="industry-card">🏦 <span>Banca</span></div>
-        <div class="industry-card">🏥 <span>Salud</span></div>
-        <div class="industry-card">⚖️ <span>Legal</span></div>
-        <div class="industry-card">🌱 <span>Agricultura</span></div>
-        <div class="industry-card">💼 <span>Reclutamiento</span></div>
-        <div class="industry-card">🤝 <span>Gobierno</span></div>
-      </div>
+      <div class="industries-grid">${industriesHtml}</div>
     </div>
   `;
+
+  // Tabs interaction
+  homeMarkdownEl.querySelectorAll('.skill-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const idx = tab.dataset.tab;
+      homeMarkdownEl.querySelectorAll('.skill-tab').forEach(t => t.classList.remove('active'));
+      homeMarkdownEl.querySelectorAll('.skill-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      homeMarkdownEl.querySelector(`.skill-panel[data-panel="${idx}"]`).classList.add('active');
+    });
+  });
 }
 
 // Cargar y renderizar preguntas rápidas desde JSON

@@ -1,125 +1,214 @@
-# GenAI Portafolio
+# GenAI Portafolio — George Pineda
 
-## Resumen ejecutivo
-GenAI Portafolio es un sitio web con chat de IA que presenta el perfil profesional de George Pineda y responde consultas basadas en un prompt de CV. El frontend es estatico y se sirve desde el backend Flask, el cual expone una API REST para el chat.
+Portafolio profesional interactivo de **George Pineda**, AI Engineer especializado en IA Generativa, agentes conversacionales y soluciones multiagente. El sitio incluye un chatbot impulsado por LLM que responde preguntas sobre el perfil y experiencia del autor.
 
-## Caracteristicas clave
-- Chat conversacional con memoria de sesion en backend.
-- Prompt controlado con informacion del CV y politicas de respuesta.
-- Frontend listo para consumo directo desde el servidor Flask.
-- Endpoint de salud para verificacion rapida.
+---
 
-## Arquitectura (alto nivel)
-- Frontend estatico: `frontend/` (HTML, CSS, JS).
-- Backend API: `backend/` (Flask + LangChain + OpenAI).
-- Orquestacion: `backend/app/orchestration/` (agent, tools, prompt).
+## ¿Qué hace este proyecto?
 
-## Stack tecnologico
-- Backend: Python 3.11, Flask, LangChain, OpenAI SDK.
-- Frontend: HTML, CSS, JavaScript.
+- Presenta el perfil, proyectos y stack tecnológico de George Pineda.
+- Expone un chatbot conversacional con memoria de sesión que responde preguntas sobre el CV.
+- El frontend estático es servido directamente por el backend Flask, sin necesidad de servidor web externo.
+- Incluye rate limiting por IP para evitar abuso del endpoint de chat.
+
+---
+
+## Arquitectura
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Navegador                        │
+│   HTML + CSS + Vanilla JS  (frontend/)              │
+│   - profile.json, projects-list.json, home-panel.json│
+│   - content/*.md  (cargados on-demand por modal)   │
+└──────────────────────┬──────────────────────────────┘
+                       │  HTTP / SSE
+┌──────────────────────▼──────────────────────────────┐
+│             Flask App  (backend/)                   │
+│  main.py → create_app()                             │
+│  ├── GET  /                  → sirve index.html     │
+│  ├── GET  /<path>            → assets estáticos     │
+│  └── Blueprint /api/v1/                             │
+│       ├── GET  /health                              │
+│       ├── POST /chat          (blocking)            │
+│       ├── POST /chat/stream   (SSE streaming)       │
+│       └── GET  /contacts                            │
+│                                                     │
+│  Orchestration                                      │
+│  ├── LangChainOrchestrator (memoria de sesión)      │
+│  ├── LangChain Agent (create_agent / LangGraph)     │
+│  ├── system_prompt.jinja  (CV + reglas del bot)     │
+│  └── Tools: csv_tool, time_tool (deshabilitadas)    │
+│                                                     │
+│  Core                                               │
+│  └── RateLimiter (in-memory, por IP)                │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Estructura del Repositorio
+
+```
+genai-portafolio/
+├── frontend/                 # UI estática
+│   ├── index.html
+│   ├── app.js                # Toda la lógica de UI (vanilla JS)
+│   ├── styles.css            # Estilos completos (~2300 líneas)
+│   ├── assets/               # Imágenes de proyectos, avatar, CV PDF
+│   └── content/              # Contenido en JSON y Markdown
+│       ├── profile.json      # Datos personales, tiles, stack
+│       ├── home-panel.json   # Métricas, habilidades por categoría
+│       ├── quick-questions.json
+│       ├── projects-list.json
+│       └── projects/*.md     # Descripción detallada por proyecto
+│
+├── backend/                  # API REST + serving del frontend
+│   ├── main.py               # Entrypoint Flask
+│   ├── pyproject.toml        # Dependencias (uv)
+│   ├── .env-example          # Variables de entorno de ejemplo
+│   ├── app/
+│   │   ├── api/v1/routes.py  # Endpoints REST
+│   │   ├── config/base.py    # Settings desde .env
+│   │   ├── core/rate_limiter.py
+│   │   └── orchestration/
+│   │       ├── orchestrator.py
+│   │       ├── prompt/system_prompt.jinja
+│   │       └── tools/        # csv_tool, time_tool
+│   ├── storage/
+│   │   └── info-table-genai.csv
+│   └── test/unit-tests/
+│
+├── docs/                     # Documentación extendida
+│   ├── API_CONTRACT.md       # Contrato completo de la API
+│   ├── RATE_LIMITING.md
+│   └── QUICK_START.md
+│
+├── run_local.sh              # Script de arranque rápido
+└── setup_terminal.sh
+```
+
+---
+
+## Stack Tecnológico
+
+| Capa | Tecnología |
+|---|---|
+| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| Backend | Python 3.11, Flask, Flask-CORS |
+| IA / LLM | LangChain, LangGraph, OpenAI API |
+| Prompt | Jinja2 |
+| Tests | pytest, pytest-cov |
+| Gestor de paquetes | uv |
+| Modelo por defecto | gpt-4.1-nano |
+
+---
 
 ## Requisitos
+
 - Python 3.11+
-- `uv` instalado
-- Clave de API de OpenAI
+- [`uv`](https://github.com/astral-sh/uv) instalado
+- API Key de OpenAI
 
-## Instalar uv
-Opcion recomendada (Homebrew en macOS):
+### Instalar uv
+
 ```bash
+# macOS (Homebrew)
 brew install uv
-```
 
-Alternativa (instalador oficial):
-```bash
+# Instalador oficial
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-Despues de instalar, recarga el PATH:
-```bash
 source "$HOME/.local/bin/env"
 ```
 
-## Configuracion de entorno
-1. Copia el archivo de ejemplo y ajusta valores:
-   - `backend/.env-example` -> `backend/.env`
-2. Variables disponibles:
+---
 
-| Variable | Descripcion | Ejemplo |
-| --- | --- | --- |
-| `PROJECT_NAME` | Nombre del proyecto mostrado en prompts | `Portafolio GenAI` |
-| `OPENAI_API_KEY` | API key de OpenAI | `sk-...` |
-| `OPENAI_MODEL` | Modelo a utilizar | `gpt-4.1-nano` |
-| `OPENAI_TEMPERATURE` | Temperatura del modelo | `0` |
-| `LIMIT_TOKENS` | Limite de tokens (uso interno) | `20000` |
-| `LIMIT_QUESTIONS` | Limite de preguntas (uso interno) | `10` |
+## Configuración de Entorno
 
-## Instalacion local (backend con uv)
+Copia el archivo de ejemplo y edita los valores:
+
 ```bash
+cp backend/.env-example backend/.env
+```
+
+| Variable | Descripción | Default |
+|---|---|---|
+| `OPENAI_API_KEY` | API Key de OpenAI | — (requerida) |
+| `OPENAI_MODEL` | Modelo LLM a usar | `gpt-4.1-nano` |
+| `OPENAI_TEMPERATURE` | Temperatura del modelo | `0` |
+| `PROJECT_NAME` | Nombre del proyecto | `Portafolio GenAI` |
+| `LIMIT_TOKENS` | Límite de tokens (referencial) | `20000` |
+| `MAX_QUESTIONS_PER_USER` | Preguntas máx. por IP | `8` |
+| `RATE_LIMIT_WINDOW_HOURS` | Horas de espera al alcanzar límite | `2` |
+| `FLASK_HOST` | Host del servidor | `0.0.0.0` |
+| `FLASK_PORT` | Puerto del servidor | `8000` |
+| `FRONTEND_DIR` | Ruta al frontend | `../frontend` |
+
+---
+
+## Instalación y Ejecución Local
+
+```bash
+# 1. Instalar dependencias del backend
 cd backend
 uv venv --python "$(which python3)"
 source .venv/bin/activate
 uv sync
+
+# 2. Configurar variables de entorno
+cp .env-example .env
+# Editar .env y colocar OPENAI_API_KEY
+
+# 3. Ejecutar
+uv run python main.py
 ```
 
-## Ejecutar en local
-### Backend (sirve tambien el frontend)
-```bash
-cd backend
-source .venv/bin/activate
-uv run flask --app main:create_app run --host 0.0.0.0 --port 8000
-```
+O con el script de la raíz:
 
-Abre `http://localhost:8000` para ver el sitio.
-
-### Script rapido (desde la raiz)
 ```bash
 ./run_local.sh
 ```
 
-## API
-- `GET /api/v1/health` -> estado del servicio.
-- `POST /api/v1/chat` -> envia un mensaje y recibe respuesta.
+Accede en: **http://localhost:8000**
 
-Ejemplo:
+---
+
+## API (resumen)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| `GET` | `/api/v1/health` | Estado del servicio |
+| `POST` | `/api/v1/chat` | Chat bloqueante |
+| `POST` | `/api/v1/chat/stream` | Chat con streaming SSE |
+| `GET` | `/api/v1/contacts` | Contactos guardados (CSV) |
+
+Ver contrato completo en [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).
+
+---
+
+## Rate Limiting
+
+- Límite por IP: `MAX_QUESTIONS_PER_USER` preguntas en una ventana de `RATE_LIMIT_WINDOW_HOURS` horas.
+- Identificación: cabecera `X-Forwarded-For` o `request.remote_addr`.
+- Al superar el límite: HTTP 429 con tiempo de espera restante.
+- Almacenamiento: **en memoria** (se resetea al reiniciar el servidor).
+
+---
+
+## Tests
+
 ```bash
-curl -X POST http://localhost:8000/api/v1/chat \
-  -H 'Content-Type: application/json' \
-  -d '{"message":"Hola","session_id":""}'
+cd backend
+source .venv/bin/activate
+uv run pytest test/unit-tests -v
 ```
 
-### Rate Limiting
-El sistema incluye limitación de uso por IP para evitar abuso:
-- Cada IP puede hacer hasta `MAX_QUESTIONS_PER_USER` preguntas (por defecto: 8)
-- Al alcanzar el límite, se debe esperar `RATE_LIMIT_WINDOW_HOURS` horas (por defecto: 2 horas)
-- El contador se muestra en el chat para que el usuario sepa cuántas preguntas le quedan
-- El endpoint retorna código HTTP 429 cuando se alcanza el límite
+---
 
-Respuesta del endpoint `/chat`:
-```json
-{
-  "reply": "Respuesta del asistente",
-  "session_id": "abc123",
-  "remaining_questions": 5
-}
-```
+## Notas Importantes
 
-Cuando se alcanza el límite (HTTP 429):
-```json
-{
-  "error": "Has alcanzado el límite de 8 preguntas. Por favor espera 1h 45m para poder continuar.",
-  "remaining_questions": 0,
-  "rate_limited": true
-}
-```
+- Las **sesiones del chatbot** se mantienen en memoria del proceso — no persisten entre reinicios.
+- El **rate limiter** también es in-memory — se resetea al reiniciar.
+- **CORS** está abierto a todos los orígenes (`*`) — ajustar para producción.
+- Las **herramientas del agente** (csv_tool, time_tool) están deshabilitadas por defecto (`TOOLS_ENABLED=False`).
 
-## Notas operativas
-- Las sesiones se mantienen en memoria del proceso (no hay persistencia).
-- El frontend asume que el backend esta en el mismo origen (`/api/v1/chat`).
-
-## Estructura del repo
-- `backend/`: API y orquestacion IA.
-- `frontend/`: UI estatica.
-
-## Roadmap sugerido
-- Persistencia de sesiones y contactos.
-- Manejo de configuraciones por entorno.
-- Pruebas automatizadas y CI.

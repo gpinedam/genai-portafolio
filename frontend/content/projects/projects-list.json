@@ -10,7 +10,7 @@
       "type": "sin-demo",
       "implementation": "enterprise",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      "featured": true
+      "featured": false
     },
     {
       "id": "GYS-LEGALDOC",
@@ -22,7 +22,7 @@
       "type": "sin-demo",
       "implementation": "poc",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      "featured": true
+      "featured": false
     },
     {
       "id": "GYS-MEDICALDOC",
@@ -61,14 +61,14 @@
     {
       "id": "MICROSOFT-KYCMCP",
       "title": "MCP para evaluacion de clientes en banca",
-      "category": "Agricultura",
+      "category": "Finanzas",
       "tags": ["GPT-4.1", "MCP", "BACKEND"],
       "image": "/assets/MICROSOFT-KYCMCP.jpg",
       "file": "MICROSOFT-KYCMCP.md",
       "type": "sin-demo",
       "implementation": "enterprise",
       "demoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      "featured": false
+      "featured": true
     },
     {
       "id": "AJE-DEMO",

@@ -25,9 +25,8 @@ const viewCopy = {
     text: ""
   },
   contact: {
-    title: "Deja tu informacion",
-    text:
-      "Puedes chatear con el agente para brindar tu informacion, este la guardara y se mostrara."
+    title: "Contacto",
+    text: ""
   }
 };
 
@@ -136,35 +135,91 @@ async function loadViewCopyFromMarkdown() {
 }
 
 async function loadHomeMarkdown() {
-  if (!homeMarkdownEl) return;
-  
-  // Esperar a que se carguen los markdowns primero
+  // Replace with the rich visual panel
+  await renderHomePanel();
+
+  // Still load markdown sources for intro text in header
   await loadViewCopyFromMarkdown();
-  
-  // Usar el contenido cargado desde markdown si existe
-  if (viewCopy.home.homePanelHtml) {
-    homeMarkdownEl.innerHTML = viewCopy.home.homePanelHtml;
-    return;
-  }
-  
-  // Si no, usar el contenido hardcoded
-  if (viewCopy.home.homePanel) {
-    homeMarkdownEl.textContent = viewCopy.home.homePanel;
-    return;
-  }
-  
-  // Fallback: intentar cargar directamente
-  if (!window.marked || !window.DOMPurify) return;
-  try {
-    const text = await fetchText("/content/home-page/home-page-home.md");
-    homeMarkdownEl.innerHTML = DOMPurify.sanitize(marked.parse(text));
-  } catch (err) {
-    homeMarkdownEl.textContent = "No se pudo cargar el contenido.";
-  }
 }
 
 loadHomeMarkdown();
 loadViewCopyFromMarkdown();
+
+// ====================================================
+// RICH HOME PANEL — Metrics + Tech Stack (data-driven)
+// ====================================================
+async function renderHomePanel() {
+  if (!homeMarkdownEl) return;
+
+  let data = { metrics: [], stack: [], industries: [] };
+  try {
+    const res = await fetch("/content/home-panel.json");
+    if (res.ok) data = await res.json();
+  } catch (e) {
+    console.error("Error cargando home-panel.json:", e);
+  }
+
+  const metricsHtml = data.metrics.map(m => `
+    <div class="metric-card">
+      <div class="metric-value">${m.value}</div>
+      <div class="metric-label">${m.label}</div>
+    </div>`).join("");
+
+  const stackData = data.stack.map(row => {
+    const skills = row.skills || [];
+    const avg = skills.length
+      ? (skills.reduce((sum, s) => sum + s.level, 0) / skills.length).toFixed(1)
+      : '—';
+    const skillsHtml = skills.map(s => {
+      const filled = s.level;
+      const dots = Array.from({length: 5}, (_, i) =>
+        `<span class="dot ${i < filled ? 'filled' : 'empty'}"></span>`
+      ).join('');
+      return `<div class="skill-row"><span class="skill-name">${s.name}</span><div class="skill-dots">${dots}</div></div>`;
+    }).join('');
+    return { category: row.category, avg, skillsHtml };
+  });
+
+  const tabNavHtml = stackData.map((row, i) => `
+    <button class="skill-tab${i === 0 ? ' active' : ''}" data-tab="${i}">
+      ${row.category}
+      <span class="tab-avg">${row.avg}<span class="tab-avg-denom">/5</span></span>
+    </button>`).join('');
+
+  const tabPanelsHtml = stackData.map((row, i) => `
+    <div class="skill-panel${i === 0 ? ' active' : ''}" data-panel="${i}">
+      <div class="skill-grid">${row.skillsHtml}</div>
+    </div>`).join('');
+
+  const stackHtml = `
+    <div class="skill-tabs">
+      <div class="skill-tabs-nav">${tabNavHtml}</div>
+      <div class="skill-tabs-body">${tabPanelsHtml}</div>
+    </div>`;
+
+  const industriesHtml = data.industries.map(ind => `
+    <div class="industry-card">${ind.emoji} <span>${ind.label}</span></div>`).join("");
+
+  homeMarkdownEl.innerHTML = `
+    <div class="impact-metrics">${metricsHtml}</div>
+    <div class="skill-table">${stackHtml}</div>
+    <div class="industries-section">
+      <div class="stack-group-label">Industrias</div>
+      <div class="industries-grid">${industriesHtml}</div>
+    </div>
+  `;
+
+  // Tabs interaction
+  homeMarkdownEl.querySelectorAll('.skill-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const idx = tab.dataset.tab;
+      homeMarkdownEl.querySelectorAll('.skill-tab').forEach(t => t.classList.remove('active'));
+      homeMarkdownEl.querySelectorAll('.skill-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      homeMarkdownEl.querySelector(`.skill-panel[data-panel="${idx}"]`).classList.add('active');
+    });
+  });
+}
 
 // Cargar y renderizar preguntas rápidas desde JSON
 async function loadQuickQuestions() {
@@ -180,121 +235,287 @@ async function loadQuickQuestions() {
 }
 
 function renderQuickQuestions(questions) {
-  const container = document.getElementById("quickQuestions");
-  if (!container) return;
-  
-  container.innerHTML = "";
-  
+  // Inject suggestion cards directly into the messages area
+  const block = document.createElement("div");
+  block.className = "suggestions-block";
+  block.id = "suggestionsBlock";
+
   questions.forEach(q => {
-    const button = document.createElement("button");
-    button.className = "question-bubble";
-    button.dataset.question = q.question;
-    button.textContent = `${q.emoji} ${q.label}`;
-    container.appendChild(button);
+    const btn = document.createElement("button");
+    btn.className = "suggestion-card";
+    btn.dataset.question = q.question;
+    btn.innerHTML = `<span class="suggestion-emoji">${q.emoji}</span><span class="suggestion-label">${q.label}</span>`;
+    block.appendChild(btn);
   });
+
+  homeMessagesEl.appendChild(block);
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+}
+
+function removeSuggestions() {
+  const el = document.getElementById("suggestionsBlock");
+  if (el) el.remove();
 }
 
 loadQuickQuestions();
 
-// Cargar y mostrar proyectos dinámicamente
+// ============================================
+// PROJECTS — Carga dinámica, filtros, modal
+// ============================================
+
+let allProjects = [];
+let activeFilter = 'todos';
+
 async function loadProjects() {
   try {
     const response = await fetch("/content/projects/projects-list.json");
     if (!response.ok) throw new Error("No se pudo cargar projects-list.json");
-    
     const data = await response.json();
-    
-    // Separar proyectos por tipo
-    const projectsConDemo = data.projects.filter(p => p.type === "con-demo");
-    const projectsSinDemo = data.projects.filter(p => p.type === "sin-demo");
-    
-    renderProjectsGrid(projectsConDemo, "projectsGridDemo", true);
-    renderProjectsGrid(projectsSinDemo, "projectsGridNoDemo", false);
+    allProjects = data.projects || [];
+    buildFilterPills(allProjects);
+    renderProjects('todos');
   } catch (err) {
     console.error("Error cargando proyectos:", err);
   }
 }
 
-function renderProjectsGrid(projects, gridId, hasDemo) {
-  const grid = document.getElementById(gridId);
-  if (!grid) return;
-  
-  grid.innerHTML = "";
-  
-  projects.forEach(project => {
-    const card = document.createElement("div");
-    
-    // Construir clases de forma modular
-    const classes = ['project-card'];
-    if (hasDemo) classes.push('has-demo');
-    if (project.implementation) {
-      classes.push(`impl-${project.implementation}`);
-    }
-    card.className = classes.join(' ');
-    
-    // Determinar si hay imagen personalizada
-    const hasCustomImage = project.image && !project.image.includes('placeholder');
-    const imageStyle = hasCustomImage 
-      ? `style="background-image: url('${project.image}'); background-size: cover; background-position: center;"` 
-      : '';
-    const imageClass = hasCustomImage ? 'has-custom-image' : '';
-    
-    card.innerHTML = `
-      <div class="project-card-image ${imageClass}" ${imageStyle}></div>
-      <div class="project-card-content">
-        <div class="project-card-category">${project.category}</div>
-        <h3 class="project-card-title">${project.title}</h3>
-        <div class="project-card-tags">
-          ${project.tags.map(tag => `<span class="project-tag">${tag}</span>`).join('')}
-        </div>
-      </div>
-    `;
-    
-    card.addEventListener("click", () => openProjectModal(project));
-    grid.appendChild(card);
+function buildFilterPills(projects) {
+  const bar = document.getElementById("projectsFilterBar");
+  if (!bar) return;
+
+  const filters = [
+    { value: 'todos', label: 'Todos' },
+    { value: 'con-demo', label: '▶ Con Demo' },
+    ...Array.from(new Set(projects.map(p => p.category)))
+      .sort()
+      .map(cat => ({ value: cat, label: cat }))
+  ];
+
+  bar.innerHTML = filters.map(f => `
+    <button class="filter-pill${f.value === 'todos' ? ' active' : ''}" data-filter="${f.value}">
+      ${f.label}
+    </button>
+  `).join('');
+
+  bar.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      bar.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeFilter = pill.dataset.filter;
+      renderProjects(activeFilter);
+    });
   });
+
+  // View toggle (grid / list)
+  const toggleEl = document.getElementById('projectsViewToggle');
+  if (toggleEl) {
+    toggleEl.innerHTML = `
+      <button class="view-toggle-btn active" data-layout="grid" title="Vista cuadrícula">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+          <rect x="0" y="0" width="6" height="6" rx="1"/>
+          <rect x="8" y="0" width="6" height="6" rx="1"/>
+          <rect x="0" y="8" width="6" height="6" rx="1"/>
+          <rect x="8" y="8" width="6" height="6" rx="1"/>
+        </svg>
+      </button>
+      <button class="view-toggle-btn" data-layout="list" title="Vista lista">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+          <rect x="0" y="0" width="14" height="2.5" rx="1"/>
+          <rect x="0" y="5.75" width="14" height="2.5" rx="1"/>
+          <rect x="0" y="11.5" width="14" height="2.5" rx="1"/>
+        </svg>
+      </button>
+    `;
+    toggleEl.querySelectorAll('.view-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        toggleEl.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const grid = document.getElementById('projectsGrid');
+        if (grid) grid.classList.toggle('list-view', btn.dataset.layout === 'list');
+      });
+    });
+  }
+}
+
+const IMPL_LABELS = {
+  enterprise: { label: 'ENTERPRISE', color: '#ffd700' },
+  poc:        { label: 'POC',        color: '#4a9eff' },
+  mvp:        { label: 'MVP',        color: '#9b59b6' },
+  demo:       { label: 'DEMO',       color: '#f6c638' }
+};
+
+function renderProjects(filter) {
+  const grid = document.getElementById("projectsGrid");
+  const countEl = document.getElementById("projectsCount");
+  if (!grid) return;
+
+  let filtered = allProjects;
+  if (filter === 'con-demo') {
+    filtered = allProjects.filter(p => p.type === 'con-demo');
+  } else if (filter !== 'todos') {
+    filtered = allProjects.filter(p => p.category === filter);
+  }
+
+  // Featured primero
+  filtered = [
+    ...filtered.filter(p => p.featured),
+    ...filtered.filter(p => !p.featured)
+  ];
+
+  if (countEl) {
+    const total = allProjects.length;
+    const shown = filtered.length;
+    countEl.textContent = shown === total
+      ? `${total} proyectos`
+      : `${shown} de ${total} proyectos`;
+  }
+
+  grid.innerHTML = '';
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<p class="projects-empty">No hay proyectos en esta categoría.</p>';
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const delay = parseInt(entry.target.style.transitionDelay) || 0;
+        entry.target.classList.add('card-visible');
+        // Clear stagger delay after entry so hover transitions are instant
+        setTimeout(() => {
+          entry.target.style.transitionDelay = '0ms';
+        }, delay + 450);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  filtered.forEach((project, i) => {
+    const card = createProjectCard(project, i);
+    grid.appendChild(card);
+    observer.observe(card);
+  });
+}
+
+function createProjectCard(project, index) {
+  const card = document.createElement('div');
+  const impl = project.implementation || '';
+  const isFeatured = project.featured;
+  const hasDemo = project.type === 'con-demo';
+
+  const classes = ['project-card'];
+  if (impl) classes.push(`impl-${impl}`);
+  if (isFeatured) classes.push('featured');
+  if (hasDemo) classes.push('has-demo');
+  card.className = classes.join(' ');
+  // Stagger delay for IntersectionObserver entry animation
+  card.style.transitionDelay = `${index * 55}ms`;
+
+  const implInfo = IMPL_LABELS[impl];
+  // Expose impl color as CSS var for hover border
+  if (implInfo) card.style.setProperty('--card-impl-color', implInfo.color);
+
+  const hasCustomImage = project.image && !project.image.includes('placeholder');
+  const imageStyle = hasCustomImage
+    ? `style="background-image:url('${project.image}');background-size:cover;background-position:center;"`
+    : '';
+  const imageClass = hasCustomImage ? 'has-custom-image' : '';
+
+  const implBadge = implInfo
+    ? `<span class="impl-badge" style="--impl-color:${implInfo.color}">${implInfo.label}</span>`
+    : '';
+
+  card.innerHTML = `
+    <div class="project-card-image ${imageClass}" ${imageStyle}>
+      <div class="card-img-bottom">
+        <span class="project-card-category">${project.category}</span>
+        ${implBadge}
+      </div>
+      <div class="project-card-overlay">
+        <span class="overlay-cta">${hasDemo ? '▶ Ver Demo' : 'Ver Proyecto'}</span>
+      </div>
+    </div>
+    <div class="project-card-content">
+      <div class="card-list-meta">
+        <span class="project-card-category">${project.category}</span>
+        ${implBadge}
+      </div>
+      <h3 class="project-card-title">${project.title}</h3>
+      <div class="project-card-tags">
+        ${project.tags.slice(0, 3).map(tag => `<span class="project-tag">${tag}</span>`).join('')}
+      </div>
+    </div>
+  `;
+
+  card.addEventListener('click', () => openProjectModal(project));
+  return card;
 }
 
 async function openProjectModal(project) {
   const modal = document.getElementById("projectModal");
   const modalBody = document.getElementById("modalBody");
-  
   if (!modal || !modalBody) return;
-  
+
+  const impl = project.implementation || '';
+  const implInfo = IMPL_LABELS[impl];
+  const implBadge = implInfo
+    ? `<span class="impl-badge modal-impl-badge" style="--impl-color:${implInfo.color}">${implInfo.label}</span>`
+    : '';
+
+  const hasCustomImage = project.image && !project.image.includes('placeholder');
+  const headerBg = hasCustomImage
+    ? `background-image:url('${project.image}');background-size:cover;background-position:center;`
+    : '';
+
+  const hasDemo = project.type === 'con-demo' && project.demoUrl;
+
+  let htmlContent = `
+    <div class="modal-project-header" style="${headerBg}">
+      <div class="modal-project-header-overlay">
+        <div class="modal-project-header-badges">
+          ${implBadge}
+          <span class="modal-category-badge">${project.category}</span>
+          ${hasDemo ? '<span class="modal-demo-badge">▶ Con Demo</span>' : ''}
+        </div>
+        <h1 class="modal-project-title">${project.title}</h1>
+        <div class="modal-project-tags">
+          ${project.tags.map(tag => `<span class="project-tag">${tag}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (hasDemo) {
+    htmlContent += `
+      <div class="project-demo-video">
+        <iframe
+          src="${project.demoUrl}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    `;
+  }
+
+  modalBody.innerHTML = htmlContent + '<div class="modal-markdown-body"><p style="color:var(--text-muted);font-size:13px">Cargando...</p></div>';
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+
   try {
     const response = await fetch(`/content/projects/${project.file}`);
     if (!response.ok) throw new Error("No se pudo cargar el proyecto");
-    
     const markdown = await response.text();
-    
-    let htmlContent = "";
-    
-    // Si tiene demo, agregar el video de YouTube al inicio
-    if (project.type === "con-demo" && project.demoUrl) {
-      htmlContent += `
-        <div class="project-demo-video">
-          <iframe 
-            src="${project.demoUrl}" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
-        </div>
-      `;
+    const mdEl = modalBody.querySelector('.modal-markdown-body');
+    if (mdEl && window.marked && window.DOMPurify) {
+      mdEl.innerHTML = DOMPurify.sanitize(marked.parse(markdown));
+    } else if (mdEl) {
+      mdEl.textContent = markdown;
     }
-    
-    if (window.marked && window.DOMPurify) {
-      htmlContent += DOMPurify.sanitize(marked.parse(markdown));
-      modalBody.innerHTML = htmlContent;
-    } else {
-      modalBody.innerHTML = htmlContent + markdown;
-    }
-    
-    modal.classList.add("active");
-    document.body.style.overflow = "hidden";
   } catch (err) {
     console.error("Error cargando detalles del proyecto:", err);
-    modalBody.innerHTML = "<p>Error cargando el proyecto.</p>";
-    modal.classList.add("active");
+    const mdEl = modalBody.querySelector('.modal-markdown-body');
+    if (mdEl) mdEl.innerHTML = "<p>Error cargando el proyecto.</p>";
   }
 }
 
@@ -316,17 +537,12 @@ if (modalClose) {
 
 if (projectModal) {
   projectModal.addEventListener("click", (e) => {
-    if (e.target === projectModal) {
-      closeProjectModal();
-    }
+    if (e.target === projectModal) closeProjectModal();
   });
 }
 
-// Cerrar modal con tecla ESC
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeProjectModal();
-  }
+  if (e.key === "Escape") closeProjectModal();
 });
 
 loadProjects();
@@ -363,94 +579,310 @@ function appendHomeMessage(text, role) {
 function updateQuestionCounter() {
   const counterEl = document.getElementById("questionCounter");
   if (!counterEl) return;
-  
+
   if (isRateLimited) {
-    counterEl.textContent = "⚠️ Chat bloqueado. Espera el tiempo indicado.";
-    counterEl.style.color = "#ff4444";
+    counterEl.textContent = "⚠ bloqueado";
+    counterEl.style.color = "#ff5555";
   } else if (remainingQuestions !== null) {
-    counterEl.textContent = `📊 Preguntas restantes: ${remainingQuestions}`;
-    
-    // Cambiar color según las preguntas restantes
     if (remainingQuestions <= 2) {
-      counterEl.style.color = "#ff4444";
+      counterEl.textContent = `${remainingQuestions} restante${remainingQuestions !== 1 ? "s" : ""}`;
+      counterEl.style.color = "#ff5555";
     } else if (remainingQuestions <= 4) {
+      counterEl.textContent = `${remainingQuestions} restantes`;
       counterEl.style.color = "#ffa500";
     } else {
-      counterEl.style.color = "#4CAF50";
+      counterEl.textContent = "";
+      counterEl.style.color = "";
     }
   }
 }
 
+// ====================================================
+// CHAT — Typing indicator helpers
+// ====================================================
+function showTypingIndicator() {
+  const div = document.createElement("div");
+  div.className = "typing-indicator";
+  div.id = "typingIndicator";
+  div.innerHTML = `
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+  `;
+  homeMessagesEl.appendChild(div);
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+  return div;
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById("typingIndicator");
+  if (el) el.remove();
+}
+
+function createStreamingBotMessage() {
+  removeTypingIndicator();
+  const div = document.createElement("div");
+  div.className = "msg bot streaming";
+  homeMessagesEl.appendChild(div);
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+  return div;
+}
+
+function finalizeStreamingMessage(msgEl, fullText) {
+  msgEl.classList.remove("streaming");
+  if (window.marked && window.DOMPurify) {
+    msgEl.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
+  } else {
+    msgEl.textContent = fullText;
+  }
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+}
+
+function addResponseMeta(msgEl, elapsedMs, tokens) {
+  const sec = (elapsedMs / 1000).toFixed(1);
+  const meta = document.createElement("div");
+  meta.className = "msg-meta";
+  meta.textContent = `GPT-4.1 · ${sec}s · ${tokens} tok`;
+  msgEl.insertAdjacentElement("afterend", meta);
+  homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+}
+
+// ====================================================
+// CHAT — SSE streaming send
+// ====================================================
 async function sendHomeMessage() {
   const text = homeInputEl.value.trim();
   if (!text) return;
-  
-  // Si está bloqueado, no permitir enviar
+
   if (isRateLimited) {
     appendHomeMessage("El chat está bloqueado temporalmente. Por favor espera el tiempo indicado.", "bot");
     return;
   }
 
+  removeSuggestions();
   appendHomeMessage(text, "user");
   homeInputEl.value = "";
+  homeInputEl.disabled = true;
+  homeSendBtn.disabled = true;
+  showTypingIndicator();
 
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch("/api/v1/chat/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text, session_id: sessionId })
     });
 
-    const data = await res.json();
-    
-    // Manejar rate limiting (HTTP 429)
+    // Rate limited—raw JSON response, not a stream
     if (res.status === 429) {
+      removeTypingIndicator();
+      const data = await res.json();
       isRateLimited = true;
-      remainingQuestions = data.remaining_questions || 0;
-      appendHomeMessage(data.error || "Has alcanzado el límite de preguntas.", "bot");
+      remainingQuestions = data.remaining_questions ?? 0;
       updateQuestionCounter();
-      
-      // Deshabilitar el input y botón
-      homeInputEl.disabled = true;
-      homeSendBtn.disabled = true;
+      appendHomeMessage(
+        data.error || "Has alcanzado el límite de preguntas. ¡Contáctame directamente!",
+        "bot"
+      );
       return;
     }
 
-    if (!res.ok) throw new Error("API error");
+    if (!res.ok || !res.body) {
+      removeTypingIndicator();
+      appendHomeMessage("No pude conectar con el backend.", "bot");
+      return;
+    }
 
-    if (data.session_id) {
-      sessionId = data.session_id;
-      localStorage.setItem("session_id", sessionId);
+    const sendTime = Date.now();
+    let tokenCount = 0;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let done = false;
+    let msgEl = null;
+    let fullText = "";
+
+    while (!done) {
+      const { done: streamDone, value } = await reader.read();
+      if (streamDone) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop(); // keep incomplete tail
+
+      for (const part of parts) {
+        if (!part.startsWith("data: ")) continue;
+        try {
+          const event = JSON.parse(part.slice(6));
+
+          if (event.type === "session") {
+            sessionId = event.session_id;
+            localStorage.setItem("session_id", sessionId);
+            remainingQuestions = event.remaining_questions;
+            updateQuestionCounter();
+
+          } else if (event.type === "chunk") {
+            fullText += event.content;
+            tokenCount++;
+            const tl = document.getElementById("tokenLive");
+            if (tl) tl.textContent = tokenCount + " tok";
+            if (!msgEl) msgEl = createStreamingBotMessage();
+            msgEl.textContent = fullText;
+            homeMessagesEl.scrollTop = homeMessagesEl.scrollHeight;
+
+          } else if (event.type === "done") {
+            done = true;
+            const tl = document.getElementById("tokenLive");
+            if (tl) tl.textContent = "";
+            if (msgEl) {
+              finalizeStreamingMessage(msgEl, fullText);
+              addResponseMeta(msgEl, Date.now() - sendTime, tokenCount);
+            } else {
+              removeTypingIndicator();
+            }
+
+          } else if (event.type === "error") {
+            done = true;
+            const tl = document.getElementById("tokenLive");
+            if (tl) tl.textContent = "";
+            if (!msgEl) msgEl = createStreamingBotMessage();
+            finalizeStreamingMessage(msgEl, event.content || "Error al generar la respuesta.");
+          }
+        } catch (_) {}
+      }
     }
-    
-    // Actualizar contador de preguntas restantes
-    if (data.remaining_questions !== undefined) {
-      remainingQuestions = data.remaining_questions;
-      updateQuestionCounter();
+
+    if (!done && fullText && msgEl) {
+      const tl = document.getElementById("tokenLive");
+      if (tl) tl.textContent = "";
+      removeToolCallPill();
+      finalizeStreamingMessage(msgEl, fullText);
+      addResponseMeta(msgEl, Date.now() - sendTime, tokenCount);
     }
-    
-    appendHomeMessage(data.reply || "Sin respuesta", "bot");
+
   } catch (err) {
+    removeTypingIndicator();
     appendHomeMessage("No pude conectar con el backend.", "bot");
+  } finally {
+    homeInputEl.disabled = false;
+    homeSendBtn.disabled = false;
+    homeInputEl.focus();
   }
 }
 
 homeSendBtn.addEventListener("click", sendHomeMessage);
 homeInputEl.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendHomeMessage();
+  if (e.key === "Enter" && !homeInputEl.disabled) sendHomeMessage();
 });
 
-// Funcionalidad para las burbujas de preguntas rápidas
-const quickQuestionsContainer = document.getElementById("quickQuestions");
-if (quickQuestionsContainer) {
-  quickQuestionsContainer.addEventListener("click", (e) => {
-    const bubble = e.target.closest(".question-bubble");
-    if (bubble) {
-      const question = bubble.dataset.question;
-      if (question && homeInputEl) {
-        homeInputEl.value = question;
-        sendHomeMessage();
-      }
+// ====================================================
+// CONTACT VIEW — Populate from profile.json
+// ====================================================
+(async () => {
+  try {
+    const profile = await fetch("/content/profile.json").then(r => r.json());
+
+    // Status
+    const dot        = document.getElementById("contactStatusDot");
+    const statusText = document.getElementById("contactStatusText");
+    if (dot)        dot.dataset.available = profile.status.available;
+    if (statusText) statusText.textContent = profile.status.text;
+
+    // Heading & intro
+    const heading      = document.getElementById("contactHeading");
+    const intro        = document.getElementById("contactIntro");
+    const responseNote = document.getElementById("contactResponseNote");
+    if (heading)      heading.textContent = profile.contact.heading;
+    if (intro)        intro.textContent   = profile.contact.intro;
+    if (responseNote) responseNote.textContent = profile.contact.responseNote;
+
+    // CV button
+    const cvBtn = document.getElementById("cvDownloadBtn");
+    if (cvBtn) { cvBtn.href = profile.cv.path; cvBtn.download = profile.cv.filename; }
+
+    // Email
+    const emailLink  = document.getElementById("contactEmailLink");
+    const emailValue = document.getElementById("contactEmailValue");
+    const copyBtn    = document.getElementById("copyEmailBtn");
+    if (emailLink)  emailLink.href           = `mailto:${profile.contact.email}`;
+    if (emailValue) emailValue.textContent   = profile.contact.email;
+    if (copyBtn)    copyBtn.dataset.copy     = profile.contact.email;
+
+    // LinkedIn
+    const linkedinLink   = document.getElementById("contactLinkedinLink");
+    const linkedinAction = document.getElementById("contactLinkedinAction");
+    const linkedinValue  = document.getElementById("contactLinkedinValue");
+    if (linkedinLink)   linkedinLink.href         = profile.contact.linkedin.url;
+    if (linkedinAction) linkedinAction.href       = profile.contact.linkedin.url;
+    if (linkedinValue)  linkedinValue.textContent = profile.contact.linkedin.display;
+
+    // GitHub
+    const githubLink   = document.getElementById("contactGithubLink");
+    const githubAction = document.getElementById("contactGithubAction");
+    const githubValue  = document.getElementById("contactGithubValue");
+    if (githubLink)   githubLink.href         = profile.contact.github.url;
+    if (githubAction) githubAction.href       = profile.contact.github.url;
+    if (githubValue)  githubValue.textContent = profile.contact.github.display;
+
+    // Phone
+    const phoneLink   = document.getElementById("contactPhoneLink");
+    const phoneAction = document.getElementById("contactPhoneAction");
+    const phoneValue  = document.getElementById("contactPhoneValue");
+    if (phoneLink)   phoneLink.href         = profile.contact.phone.url;
+    if (phoneAction) phoneAction.href       = profile.contact.phone.url;
+    if (phoneValue)  phoneValue.textContent = profile.contact.phone.display;
+
+    // Tiles
+    const grid = document.getElementById("contactInfoGrid");
+    if (grid && profile.tiles) {
+      grid.innerHTML = profile.tiles.map(t => `
+        <div class="contact-info-tile${t.highlight ? ' contact-info-tile--available' : ''}">
+          <span class="contact-info-icon">${t.icon}</span>
+          <div class="contact-info-label">${t.label}</div>
+          <div class="contact-info-value">${t.value}</div>
+        </div>`).join("");
     }
+
+    // Stack
+    const stackGrid = document.getElementById("contactStackGrid");
+    if (stackGrid && profile.stack) {
+      stackGrid.innerHTML = profile.stack
+        .map(tag => `<span class="contact-stack-tag">${tag}</span>`)
+        .join("");
+    }
+
+  } catch (e) {
+    const statusText = document.getElementById("contactStatusText");
+    if (statusText) statusText.textContent = "Disponible para nuevas oportunidades";
+  }
+})();
+
+// ====================================================
+// CONTACT VIEW — Copy email button
+// ====================================================
+const copyEmailBtn = document.getElementById("copyEmailBtn");
+if (copyEmailBtn) {
+  copyEmailBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const email = copyEmailBtn.dataset.copy || "gwpinedam@gmail.com";
+    navigator.clipboard.writeText(email).then(() => {
+      copyEmailBtn.textContent = "✓ Copiado";
+      setTimeout(() => { copyEmailBtn.textContent = "Copiar"; }, 2000);
+    }).catch(() => {
+      copyEmailBtn.textContent = "Copiar";
+    });
   });
 }
+
+// Suggestion cards click handler (delegated on messages area)
+homeMessagesEl.addEventListener("click", (e) => {
+  const card = e.target.closest(".suggestion-card");
+  if (card) {
+    const question = card.dataset.question;
+    if (question && homeInputEl) {
+      removeSuggestions();
+      homeInputEl.value = question;
+      sendHomeMessage();
+    }
+  }
+});

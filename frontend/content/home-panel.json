@@ -1,0 +1,67 @@
+{
+  "metrics": [
+    {
+      "value": "99%",
+      "label": "Reducción de tiempos operativos"
+    },
+    {
+      "value": "12+",
+      "label": "Proyectos end-to-end entregados"
+    },
+    {
+      "value": "1.5+",
+      "label": "Años experiencia en implementaciones de IA Generativa"
+    }
+  ],
+  "stack": [
+    {
+      "category": "Agentes de IA",
+      "skills": [
+        { "name": "RAG",             "level": 5 },
+        { "name": "Fine-tuning",     "level": 5 },
+        { "name": "MCP",             "level": 5 },
+        { "name": "Multiagente",     "level": 5 }
+    ]
+    },
+    {
+      "category": "Cloud",
+      "skills": [
+        { "name": "Azure",      "level": 5 },
+        { "name": "AWS",        "level": 3.5 },
+        { "name": "GCP",        "level": 3.5 }
+    ]
+    },
+    {
+      "category": "Backend",
+      "skills": [
+        { "name": "Python",          "level": 5 },
+        { "name": "FastAPI",         "level": 5 },
+        { "name": "Flask",           "level": 4 },
+        { "name": "sql/NoSQL",        "level": 4 },
+        { "name": "CI/CD/CT",        "level": 3 }
+    ]
+    },
+    {
+      "category": "POCs/MVPs",
+      "skills": [
+        { "name": "Streamlit",          "level": 5 },
+        { "name": "Reflex",         "level": 4 }
+    ]
+    },
+    {
+      "category": "Frontend",
+      "skills": [
+        { "name": "React",          "level": 3 },
+        { "name": "Angular",         "level": 2 }
+    ]
+    }
+  ],
+  "industries": [
+    { "emoji": "💼", "label": "Banca" },
+    { "emoji": "🏥", "label": "Salud" },
+    { "emoji": "⚖️", "label": "Legal" },
+    { "emoji": "🌱", "label": "Agricultura" },
+    { "emoji": "🤝", "label": "Gobierno" },
+    { "emoji": "🖥️", "label": "tecnología" }
+  ]
+}

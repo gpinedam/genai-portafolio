@@ -3,7 +3,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GenAI Portafolio - AI Chat</title>
+    <title>George Pineda — AI Engineer | GenAI Portfolio</title>
+    <meta name="description" content="Portafolio de George Pineda, AI Engineer especializado en IA Generativa, agentes conversacionales y sistemas multiagente. Proyectos en Azure, LangChain, RAG, MCP y más." />
+
+    <!-- Open Graph (LinkedIn, Slack, WhatsApp) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="George Pineda — AI Engineer" />
+    <meta property="og:description" content="AI Engineer especializado en IA Generativa, agentes conversacionales y soluciones end-to-end en Azure, LangChain y OpenAI." />
+    <meta property="og:image" content="/assets/avatar.png" />
+    <meta property="og:locale" content="es_PE" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="George Pineda — AI Engineer" />
+    <meta name="twitter:description" content="Portafolio interactivo con chatbot LLM. Proyectos en IA Generativa, RAG, MCP y más." />
+    <meta name="twitter:image" content="/assets/avatar.png" />
+
+    <!-- Favicon (inline SVG via data URI) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f6c638'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='16' font-weight='900' fill='%231f1f1f'>GP</text></svg>" />
+
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body data-view="home">
@@ -13,23 +31,23 @@
           <div class="avatar-frame">
             <img src="assets/avatar.png" alt="Avatar" />
           </div>
+          <a href="assets/download/CV-PINEDA-GEORGE.pdf" id="cvDownloadBtn" class="cv-download-btn" download="CV-PINEDA-GEORGE.pdf">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+            </svg>
+            DESCARGAR CV
+          </a>
         </div>
 
         <nav class="pill-nav">
           <a class="nav-link active" href="#home" data-view="home">Home</a>
           <a class="nav-link" href="#projects" data-view="projects">Projects</a>
+          <a class="nav-link" href="#contact" data-view="contact">Contacto</a>
         </nav>
-
-        <a href="assets/download/CV-PINEDA-GEORGE.pdf" class="cv-download-btn" download="CV-PINEDA-GEORGE.pdf">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
-          </svg>
-          DESCARGAR CV
-        </a>
 
         <div class="contact-buttons-wrapper">
           <div class="contact-buttons">
-            <a href="mailto:gpineda@pucp.edu.pe" class="contact-btn btn-gmail" target="_blank" title="Email">
+            <a href="mailto:gwpinedam@gmail.com" class="contact-btn btn-gmail" target="_blank" title="Email">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
               </svg>
@@ -67,32 +85,35 @@ Experiencia en agentes conversacionales, sistemas multiagente y aplicaciones end
             <div class="panel-shell">
               <div class="panel-content">
                 <div class="panel-lines" id="homeMarkdown"></div>
-                
-                <div class="quick-questions">
-                  <div class="quick-questions-label">Preguntas rápidas:</div>
-                  <div class="quick-questions-bubbles" id="quickQuestions">
-                    <!-- Las preguntas se cargan dinámicamente desde quick-questions.json -->
-                  </div>
-                </div>
               </div>
             </div>
 
             <div class="home-chat-shell">
               <div class="home-chat-panel">
-                <div class="messages" id="homeMessages">
-                  <div class="msg bot">¡Hola! Pregúntame sobre George Pineda.</div>
+                <div class="chat-header">
+                  <div class="chat-status-dot"></div>
+                  <span class="chat-header-name">george · ai</span>
+                  <span class="chat-model-badge">GPT-4.1</span>
+                  <span class="chat-token-live" id="tokenLive"></span>
+                  <span class="chat-counter" id="questionCounter"></span>
                 </div>
-                
-                <div class="question-counter" id="questionCounter"></div>
+
+                <div class="messages" id="homeMessages">
+                  <div class="msg bot">Hola 👋 Soy el asistente de George. Puedo contarte sobre su experiencia en IA Generativa, proyectos con Azure, arquitectura MCP o cualquier duda para una entrevista. ¿Por dónde empezamos?</div>
+                </div>
 
                 <div class="composer">
                   <input
                     id="homeUserInput"
                     type="text"
-                    placeholder="Escribe tu mensaje..."
+                    placeholder="Pregúntame sobre George..."
                     autocomplete="off"
                   />
-                  <button id="homeSendBtn" type="button">Enviar</button>
+                  <button id="homeSendBtn" type="button" aria-label="Enviar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
@@ -101,18 +122,15 @@ Experiencia en agentes conversacionales, sistemas multiagente y aplicaciones end
 
         <section class="view view-projects">
           <div class="projects-container">
-            <div class="projects-section">
-              <h2 class="projects-section-title">Proyectos con Demo</h2>
-              <div class="projects-grid" id="projectsGridDemo">
-                <!-- Proyectos con demo -->
-              </div>
+            <div class="projects-filter-bar" id="projectsFilterBar">
+              <!-- Pills generadas dinámicamente -->
             </div>
-            
-            <div class="projects-section">
-              <h2 class="projects-section-title">Proyectos participados</h2>
-              <div class="projects-grid" id="projectsGridNoDemo">
-                <!-- Proyectos sin demo -->
-              </div>
+            <div class="projects-toolbar">
+              <p class="projects-count" id="projectsCount"></p>
+              <div class="projects-view-toggle" id="projectsViewToggle"></div>
+            </div>
+            <div class="projects-grid" id="projectsGrid">
+              <!-- Cards generadas dinámicamente -->
             </div>
           </div>
           
@@ -128,15 +146,89 @@ Experiencia en agentes conversacionales, sistemas multiagente y aplicaciones end
         </section>
 
         <section class="view view-contact">
-          <div class="panel-shell">
-            <div class="contact-grid">
-              <div class="contact-main"></div>
-              <div class="contact-side"></div>
-              <div class="contact-input"></div>
-              <div class="contact-button"></div>
+          <div class="contact-page">
+
+            <!-- Panel principal -->
+            <div class="contact-main">
+              <div class="contact-status-bar">
+                <span class="contact-status-dot" id="contactStatusDot"></span>
+                <span class="contact-status-text" id="contactStatusText"></span>
+              </div>
+
+              <h2 class="contact-heading" id="contactHeading"></h2>
+              <p class="contact-intro" id="contactIntro"></p>
+
+              <!-- Contact cards con acción -->
+              <div class="contact-links-row">
+                <div class="contact-link-card">
+                  <a href="#" id="contactEmailLink" class="contact-link-main">
+                    <span class="contact-link-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    </span>
+                    <div class="contact-link-info">
+                      <span class="contact-link-label">Email</span>
+                      <span class="contact-link-value" id="contactEmailValue"></span>
+                    </div>
+                  </a>
+                  <button class="contact-action-btn" id="copyEmailBtn" data-copy="">Copiar</button>
+                </div>
+
+                <div class="contact-link-card">
+                  <a href="#" id="contactLinkedinLink" target="_blank" class="contact-link-main">
+                    <span class="contact-link-icon contact-link-icon--linkedin">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                    </span>
+                    <div class="contact-link-info">
+                      <span class="contact-link-label">LinkedIn</span>
+                      <span class="contact-link-value" id="contactLinkedinValue"></span>
+                    </div>
+                  </a>
+                  <a href="#" id="contactLinkedinAction" target="_blank" class="contact-action-btn">Abrir →</a>
+                </div>
+
+                <div class="contact-link-card">
+                  <a href="#" id="contactGithubLink" target="_blank" class="contact-link-main">
+                    <span class="contact-link-icon contact-link-icon--github">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+                    </span>
+                    <div class="contact-link-info">
+                      <span class="contact-link-label">GitHub</span>
+                      <span class="contact-link-value" id="contactGithubValue"></span>
+                    </div>
+                  </a>
+                  <a href="#" id="contactGithubAction" target="_blank" class="contact-action-btn">Ver repos →</a>
+                </div>
+
+                <div class="contact-link-card">
+                  <a href="#" id="contactPhoneLink" class="contact-link-main">
+                    <span class="contact-link-icon contact-link-icon--phone">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    </span>
+                    <div class="contact-link-info">
+                      <span class="contact-link-label">Teléfono</span>
+                      <span class="contact-link-value" id="contactPhoneValue"></span>
+                    </div>
+                  </a>
+                  <a href="#" id="contactPhoneAction" class="contact-action-btn">Llamar</a>
+                </div>
+              </div>
+
+              <p class="contact-response-note">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                <span id="contactResponseNote"></span>
+              </p>
             </div>
+
+            <!-- Panel lateral -->
+            <div class="contact-side">
+              <p class="contact-side-heading">Perfil rápido</p>
+              <div class="contact-info-grid" id="contactInfoGrid"></div>
+              <div class="contact-side-divider"></div>
+              <p class="contact-side-heading">Stack principal</p>
+              <div class="contact-side-stack" id="contactStackGrid"></div>
+            </div>
+
           </div>
-        </section>
       </main>
     </div>
 

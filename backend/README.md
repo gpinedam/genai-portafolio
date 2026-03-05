@@ -1,274 +1,213 @@
-# Backend - GenAI Portafolio
+# Backend — GenAI Portafolio
 
-API REST con Flask + LangChain para chatbot conversacional con IA.
+API REST construida con **Flask + LangChain** que potencia el chatbot del portafolio de George Pineda. Sirve el frontend estático, gestiona sesiones conversacionales con memoria, rate limiting por IP y streaming SSE.
 
-## 📁 Estructura del Proyecto
+---
+
+## Estructura del Proyecto
 
 ```
 backend/
+├── main.py                         # Entrypoint Flask (create_app)
+├── pyproject.toml                  # Dependencias y configuración uv
+├── .env-example                    # Plantilla de variables de entorno
+│
 ├── app/
-│   ├── __init__.py
-│   │
-│   ├── config/              # Configuración
-│   │   └── base.py          # Settings y variables de entorno
-│   │
-│   ├── core/                # Funcionalidades core
-│   │   └── rate_limiter.py  # Sistema de limitación de uso
-│   │
-│   ├── domain/              # Modelos de dominio
-│   │   └── models/
-│   │
-│   ├── orchestration/       # Orquestación de IA
-│   │   ├── orchestrator.py  # LangChain orchestrator
-│   │   ├── prompt/          # System prompts
-│   │   │   └── system_prompt.jinja
-│   │   └── tools/           # Herramientas del agente
-│   │       ├── __init__.py
-│   │       ├── csv_tool.py
-│   │       └── time_tool.py
-│   │
-│   ├── api/                 # REST API
-│   │   └── v1/
-│   │       └── routes.py    # Endpoints: /chat, /health, /contacts
-│   │
-│   └── schemas/             # Pydantic schemas
+│   ├── config/
+│   │   └── base.py                 # Settings: carga .env → objeto Settings
+│   ├── core/
+│   │   └── rate_limiter.py         # RateLimiter in-memory por IP
+│   ├── api/
+│   │   └── v1/routes.py            # Blueprint /api/v1 con todos los endpoints
+│   └── orchestration/
+│       ├── orchestrator.py         # LangChainOrchestrator (agente + memoria)
+│       ├── prompt/
+│       │   └── system_prompt.jinja # System prompt con CV de George (Jinja2)
+│       └── tools/
+│           ├── __init__.py         # build_tools() — deshabilitadas por defecto
+│           ├── csv_tool.py         # Tool: guardar contactos en CSV
+│           └── time_tool.py        # Tool: consultar hora por país
 │
-├── test/
-│   └── unit-tests/
-│       ├── conftest.py
-│       ├── test_api.py
-│       └── test_rate_limiter.py
+├── storage/
+│   └── info-table-genai.csv        # Contactos guardados por el agente
 │
-├── storage/                 # Almacenamiento local
-│   └── info-table-genai.csv
-│
-├── main.py                  # Punto de entrada (Flask app)
-├── pyproject.toml           # Configuración uv y dependencias
-└── .env-example             # Variables de entorno de ejemplo
+└── test/unit-tests/
+    ├── conftest.py
+    ├── test_api.py
+    └── test_rate_limiter.py
 ```
 
-## 🚀 Características
+---
 
-- **Chat conversacional** con memoria de sesión
-- **LangChain Agent** con herramientas personalizadas
-- **Rate Limiting** por IP (configurable)
-- **CORS habilitado** para cualquier origen
-- **Sirve frontend estático** desde Flask
-- **Tests unitarios** con pytest
+## Flujo de una Solicitud de Chat
 
-## 🔧 Configuración
+```
+Cliente
+  │
+  ▼
+POST /api/v1/chat  (o /chat/stream)
+  │
+  ├─ RateLimiter.check_limit(ip)     → 429 si superó el límite
+  ├─ RateLimiter.increment(ip)
+  ├─ _get_orchestrator(session_id)   → crea o recupera sesión en memoria
+  └─ LangChainOrchestrator.chat(msg)
+       ├─ Agrega mensaje al historial
+       ├─ Invoca LangGraph agent con historial completo
+       └─ Retorna respuesta → reply al cliente
+```
 
-### Variables de Entorno
+---
 
-Crea un archivo `.env` basado en `.env-example`:
+## Componentes Principales
+
+### `main.py` — Flask App
+- `create_app()` registra el blueprint `api_v1` y sirve el frontend estático.
+- Sirve `index.html` en `/` y cualquier asset en `/<path>`.
+- CORS abierto a todos los orígenes (`*`).
+- Host/puerto configurables: `FLASK_HOST`, `FLASK_PORT`.
+
+### `app/config/base.py` — Settings
+Singleton `settings` cargado desde `backend/.env`:
+
+| Atributo | Env Var | Default |
+|---|---|---|
+| `API_KEY` | `OPENAI_API_KEY` | — (requerido) |
+| `AI_MODEL` | `OPENAI_MODEL` | `gpt-4.1-nano` |
+| `TEMPERATURE` | `OPENAI_TEMPERATURE` | `0` |
+| `MAX_QUESTIONS_PER_USER` | `MAX_QUESTIONS_PER_USER` | `8` |
+| `RATE_LIMIT_WINDOW_HOURS` | `RATE_LIMIT_WINDOW_HOURS` | `2` |
+
+### `app/core/rate_limiter.py` — RateLimiter
+- In-memory: guarda `{ip: {count, first_request}}` en un `dict`.
+- Reset automático al cumplirse la ventana de tiempo.
+- Soporta cabecera `X-Forwarded-For` para proxies/CDN.
+- **No persiste entre reinicios del servidor.**
+
+### `app/orchestration/orchestrator.py` — LangChainOrchestrator
+- Usa `create_agent` de LangGraph internamente.
+- Mantiene `self.messages` como historial completo de la sesión.
+- `chat()` — bloqueante, devuelve el state del agente.
+- `chat_stream()` — generator de tokens para SSE, usa `StreamingCallbackHandler` + `queue.Queue` en hilo separado.
+- System prompt renderizado con Jinja2 incluyendo fecha actual.
+
+### `app/orchestration/tools/` — Herramientas del Agente
+
+Deshabilitadas por defecto (`TOOLS_ENABLED = False`).
+
+| Tool | Función |
+|---|---|
+| `csv_tool` | Guarda datos de contacto en `storage/info-table-genai.csv` |
+| `time_tool` | Retorna la hora actual en un país dado |
+
+Para habilitar: editar `TOOLS_ENABLED = True` en `tools/__init__.py` y reiniciar.
+
+---
+
+## Configuración
+
+Crea un archivo `.env` a partir de `.env-example`:
 
 ```bash
-# AI Services
-PROJECT_NAME=Portafolio GenAI
-OPENAI_API_KEY=tu_api_key_aqui
-OPENAI_MODEL=gpt-4o-mini
+cp .env-example .env
+```
+
+```env
+# Requerido
+OPENAI_API_KEY=sk-...
+
+# Opcionales
+OPENAI_MODEL=gpt-4.1-nano
 OPENAI_TEMPERATURE=0
-LIMIT_TOKENS=20000
-
-# Rate Limiting
-MAX_QUESTIONS_PER_USER=8        # Preguntas máximas por usuario
-RATE_LIMIT_WINDOW_HOURS=2       # Horas de espera tras límite
-
-# Server (opcional)
+PROJECT_NAME=Portafolio GenAI
+MAX_QUESTIONS_PER_USER=8
+RATE_LIMIT_WINDOW_HOURS=2
 FLASK_HOST=0.0.0.0
 FLASK_PORT=8000
-FRONTEND_DIR=/ruta/a/frontend   # Por defecto: ../frontend
+FRONTEND_DIR=../frontend
 ```
 
-## 📦 Instalación
-
-### Requisitos
-- Python 3.11+
-- `uv` instalado
-
-### Setup
+## Instalación
 
 ```bash
-# 1. Instalar uv (si no lo tienes)
-brew install uv
-
-# 2. Crear entorno virtual
+# Desde backend/
 uv venv --python "$(which python3)"
-
-# 3. Activar entorno
 source .venv/bin/activate
-
-# 4. Instalar dependencias
 uv sync
-
-# 5. Configurar .env
-cp .env-example .env
-# Editar .env con tu API key
 ```
 
-## 🏃 Ejecución
-
-### Modo desarrollo
+## Ejecución
 
 ```bash
-# Desde la raíz del proyecto
-./run_local.sh
-
-# O desde backend/
-cd backend
+# Opción 1 — Python directamente
 source .venv/bin/activate
 uv run python main.py
-```
 
-La aplicación estará disponible en `http://localhost:8000`
-
-### Con Flask CLI
-
-```bash
-cd backend
-source .venv/bin/activate
+# Opción 2 — Flask CLI
 uv run flask --app main:create_app run --host 0.0.0.0 --port 8000
+
+# Opción 3 — Script raíz
+cd .. && ./run_local.sh
 ```
 
-## 🧪 Testing
+Disponible en: **http://localhost:8000**
+
+## Testing
 
 ```bash
-cd backend
 source .venv/bin/activate
 
 # Todos los tests
-python -m pytest test/unit-tests -v
+uv run pytest test/unit-tests -v
 
-# Solo tests de API
-python -m pytest test/unit-tests/test_api.py -v
+# Solo API
+uv run pytest test/unit-tests/test_api.py -v
 
-# Solo tests de rate limiter
-python -m pytest test/unit-tests/test_rate_limiter.py -v
+# Solo rate limiter
+uv run pytest test/unit-tests/test_rate_limiter.py -v
 
 # Con coverage
-python -m pytest test/unit-tests --cov=app --cov-report=html
+uv run pytest test/unit-tests --cov=app --cov-report=term-missing
 ```
 
-## 📡 API Endpoints
+Ver [`test/README.md`](test/README.md) para más detalle.
 
-### Health Check
+## API Endpoints
+
+Ver contrato completo en [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md).
+
+```
+GET  /api/v1/health         → {"status": "ok"}
+POST /api/v1/chat           → {"reply", "session_id", "remaining_questions"}
+POST /api/v1/chat/stream    → SSE: session | chunk | error | done
+GET  /api/v1/contacts       → {"contacts": [...]}
+```
+
 ```bash
-GET /api/v1/health
+# Chat rápido
+curl -X POST http://localhost:8000/api/v1/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message": "¿Cuál es la experiencia de George?", "session_id": ""}'
 ```
 
-Respuesta:
-```json
-{
-  "status": "ok"
-}
-```
+## Notas de Producción
 
-### Chat
-```bash
-POST /api/v1/chat
-Content-Type: application/json
+- **Sesiones**: in-memory — considerar Redis para producción.
+- **Rate Limiter**: in-memory — no escala en múltiples workers.
+- **CORS**: `origins: "*"` — restringir en producción.
+- **Secrets**: `.env` está en `.gitignore` — no commitear API keys.
 
-{
-  "message": "Hola, ¿quién eres?",
-  "session_id": "opcional-uuid"
-}
-```
+## Troubleshooting
 
-Respuesta exitosa (200):
-```json
-{
-  "reply": "Soy un asistente que puede ayudarte...",
-  "session_id": "abc123",
-  "remaining_questions": 7
-}
-```
+**`ModuleNotFoundError: No module named 'app'`** — ejecutar siempre desde `backend/`.
 
-Límite alcanzado (429):
-```json
-{
-  "error": "Has alcanzado el límite de 8 preguntas. Por favor espera 1h 30m...",
-  "remaining_questions": 0,
-  "rate_limited": true
-}
-```
+**Rate limiting no respeta cambios** — reiniciar el servidor resetea el estado in-memory.
 
-### Contactos (CSV)
-```bash
-GET /api/v1/contacts
-```
+**Tests fallan** — verificar `source .venv/bin/activate && uv sync`.
 
-Respuesta:
-```json
-{
-  "contacts": [
-    {
-      "nombres": "Juan",
-      "apellidos": "Pérez",
-      "correo": "juan@example.com",
-      "telefono": "123456789"
-    }
-  ]
-}
-```
+## Documentación Adicional
 
-## 🔐 Rate Limiting
-
-El sistema limita el uso por dirección IP:
-
-- Máximo de preguntas: `MAX_QUESTIONS_PER_USER` (default: 8)
-- Tiempo de espera: `RATE_LIMIT_WINDOW_HOURS` (default: 2 horas)
-- Identificación: Por IP (soporta `X-Forwarded-For`)
-- Reset automático: Después del período de espera
-
-Ver [documentación completa](../docs/RATE_LIMITING.md)
-
-## 🛠️ Herramientas del Agente
-
-Actualmente deshabilitadas (`TOOLS_ENABLED=False`). Para habilitar:
-
-1. Editar `app/orchestration/tools/__init__.py`
-2. Cambiar `TOOLS_ENABLED = True`
-3. Reiniciar servidor
-
-Herramientas disponibles:
-- **CSV Tool**: Guardar contactos con validación
-- **Time Tool**: Consultar zona horaria por país
-
-## 📝 Notas de Desarrollo
-
-- Las sesiones se mantienen en **memoria** (no persisten entre reinicios)
-- Rate limiting usa **almacenamiento en memoria**
-- Flask sirve tanto backend API como frontend estático
-- CORS está habilitado para todos los orígenes (`origins: "*"`)
-
-## 🐛 Troubleshooting
-
-### Error: "No module named 'app'"
-```bash
-# Asegúrate de estar en backend/
-cd backend
-python main.py
-```
-
-### Tests fallan
-```bash
-# Verificar que el entorno esté activo
-source .venv/bin/activate
-
-# Reinstalar dependencias
-uv sync
-```
-
-### Rate limiting no funciona
-```bash
-# Verificar variables en .env
-cat .env | grep MAX_QUESTIONS
-
-# Reiniciar servidor después de cambios
-```
-
-## 📚 Documentación Adicional
-
-- [Guía de Rate Limiting](../docs/GUIA_RATE_LIMITING.md)
+- [Contrato de API](../docs/API_CONTRACT.md)
+- [Rate Limiting](../docs/RATE_LIMITING.md)
 - [Quick Start](../docs/QUICK_START.md)
 - [README Principal](../README.md)
+
